@@ -115,14 +115,18 @@ All tokens live in `src/design/design.css` as CSS custom properties.
 
 ## Demo
 
-Generate a 1920×1080 LinkedIn-ready MP4 (sub-10 s) with:
+A 9.9 s · 1920 × 1080 · H.264 walkthrough of the full flow (Welcome → Provider → AI system → Subliminal techniques · Art. 5 → Verdict reveal) is attached to the latest release:
+
+▶ **[Watch / download `linkedin-demo.mp4` (1 MB)](https://github.com/abk1969/ai_act_compass/releases/latest/download/linkedin-demo.mp4)** · also visible on the [release page](https://github.com/abk1969/ai_act_compass/releases/tag/v0.1.0).
+
+To regenerate it after design changes:
 
 ```bash
 node make-demo.cjs
 # → ./linkedin-demo.mp4
 ```
 
-Drives Vite + headless Chromium, injects an SVG cursor that follows the mouse, walks the flow Welcome → Provider → AI system → Subliminal (Art. 5) → Verdict reveal, encodes H.264 30 fps via `ffmpeg-static`.
+The script drives Vite + headless Chromium, injects an SVG cursor that follows the mouse, replays the user flow with cinematic pacing, and encodes H.264 30 fps via `ffmpeg-static`. Sub-10 s on purpose — LinkedIn-ready.
 
 ---
 
