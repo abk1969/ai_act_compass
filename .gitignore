@@ -1,0 +1,47 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build output
+dist
+dist-ssr
+build
+
+# Local env / OS
+.DS_Store
+Thumbs.db
+*.local
+.env
+.env.*
+!.env.example
+
+# Editors
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.log
+
+# Claude Code workspace
+.claude
+
+# Generated demo artefacts (re-create with: node make-demo.cjs)
+linkedin-demo.mp4
+linkedin-demo.webm
+_demo-tmp/
+_pdf-check/
+test-output/
+ai-act-compass-*.pdf
+*-demo.png

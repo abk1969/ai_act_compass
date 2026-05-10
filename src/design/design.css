@@ -1,0 +1,308 @@
+/* ============================================================================
+ * AI Act Compass — Design System v1
+ * Editorial-juridical aesthetic. EU institutional gravitas.
+ * Anchor: Regulation (EU) 2024/1689 + ISO/IEC 42001:2023 + ISO/IEC 27090:2025
+ * ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,30..100;1,9..144,300..600,30..100&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap');
+
+/* ----------------------------------------------------------------------------
+ * 1. TOKENS — single source of truth
+ * -------------------------------------------------------------------------- */
+
+:root {
+  /* Paper & ink ----------------------------------------------------------- */
+  --paper:           #FAF9F5;
+  --paper-tint:      #F2F0E6;
+  --paper-shade:     #EDEBE0;
+  --paper-deep:      #E2DFD0;
+
+  --ink:             #1A1915;
+  --ink-soft:        #3F3D38;
+  --ink-muted:       #6E6A60;
+  --ink-faint:       #9F9A8E;
+  --rule:            #D9D5C7;
+  --rule-soft:       #E5E2D5;
+  --rule-strong:     #1A1915;
+
+  /* Brand accent (terracotta) ------------------------------------------- */
+  --terracotta:      #CC785C;
+  --terracotta-soft: #FBF1EC;
+  --terracotta-deep: #A85A3F;
+  --terracotta-ink:  #5C2E1F;
+
+  /* Risk-tier semantic palette (matches CATEGORIES_META) --------------- */
+  --tier-prohibited:    #B5443C;
+  --tier-prohibited-bg: #FBE9E5;
+  --tier-prohibited-ink:#7A2E29;
+
+  --tier-high:          #CC785C;
+  --tier-high-bg:       #F8E6DD;
+  --tier-high-ink:      #7A4232;
+
+  --tier-limited:       #C8923A;
+  --tier-limited-bg:    #F5E9D2;
+  --tier-limited-ink:   #6E5429;
+
+  --tier-minimal:       #5A7A4F;
+  --tier-minimal-bg:    #E5EAD9;
+  --tier-minimal-ink:   #384F2F;
+
+  --tier-gpai:          #815B47;
+  --tier-gpai-bg:       #EFE4D8;
+  --tier-gpai-ink:      #4D372B;
+
+  --tier-gpai-rs:       #5C3F2E;
+  --tier-gpai-rs-bg:    #E5D6C5;
+  --tier-gpai-rs-ink:   #3A271C;
+
+  /* Type families ------------------------------------------------------- */
+  --font-display: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
+  --font-body:    'Fraunces', Georgia, serif;
+  --font-ui:      'Fraunces', Georgia, serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+
+  /* Fraunces optical-size axis presets (opsz, SOFT, wght) ------------- */
+  --fraunces-headline: 'opsz' 144, 'SOFT' 30, 'wght' 380;
+  --fraunces-display:  'opsz' 96,  'SOFT' 35, 'wght' 400;
+  --fraunces-body:     'opsz' 14,  'SOFT' 50, 'wght' 400;
+  --fraunces-small:    'opsz' 11,  'SOFT' 60, 'wght' 450;
+  --fraunces-caption:  'opsz' 9,   'SOFT' 70, 'wght' 500;
+
+  /* Motion -------------------------------------------------------------- */
+  --ease:        cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast:    180ms;
+  --dur-mid:     320ms;
+  --dur-slow:    520ms;
+}
+
+/* ----------------------------------------------------------------------------
+ * 2. BASE — body, headings, antialiasing
+ * -------------------------------------------------------------------------- */
+
+html, body, #root {
+  height: 100%;
+}
+
+html {
+  background: var(--paper);
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink-soft);
+  font-family: var(--font-body);
+  font-variation-settings: var(--fraunces-body);
+  font-feature-settings: "ss01" on, "kern" on, "liga" on, "onum" off;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Tailwind's default font-serif resolved to ours */
+.font-serif {
+  font-family: var(--font-display) !important;
+  font-variation-settings: var(--fraunces-display);
+  font-feature-settings: "ss01" on, "kern" on, "liga" on;
+  color: var(--ink);
+}
+.font-display {
+  font-family: var(--font-display) !important;
+  font-variation-settings: var(--fraunces-headline);
+}
+.font-mono {
+  font-family: var(--font-mono) !important;
+  letter-spacing: 0.01em;
+}
+
+/* ----------------------------------------------------------------------------
+ * 3. EDITORIAL PRIMITIVES — kicker, marginalia, rule, drop cap, numerals
+ * -------------------------------------------------------------------------- */
+
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--terracotta);
+  font-weight: 500;
+}
+
+.kicker-muted {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 500;
+}
+
+.kicker-ink {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.marginalia {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+}
+
+.numeral-roman {
+  font-family: var(--font-display);
+  font-variation-settings: 'opsz' 144, 'SOFT' 30, 'wght' 300;
+  font-style: italic;
+  letter-spacing: 0.06em;
+  color: var(--terracotta);
+  line-height: 0.9;
+}
+
+.numeral-arabic {
+  font-family: var(--font-display);
+  font-variation-settings: 'opsz' 144, 'SOFT' 25, 'wght' 320;
+  font-feature-settings: "ss01" on, "lnum" on;
+  letter-spacing: -0.02em;
+  line-height: 0.9;
+}
+
+.rule-hairline { border: 0; height: 1px; background: var(--rule); }
+.rule-soft     { border: 0; height: 1px; background: var(--rule-soft); }
+.rule-strong   { border: 0; height: 2px; background: var(--ink); }
+
+/* Drop cap for opening paragraphs (Welcome) — responsive: only kicks in
+ * at md+ to avoid clobbering tight mobile layouts. */
+@media (min-width: 768px) {
+  .drop-cap > p:first-of-type::first-letter,
+  .drop-cap-text::first-letter {
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 144, 'SOFT' 30, 'wght' 400;
+    font-feature-settings: "ss01" on;
+    font-size: 4.4em;
+    line-height: 0.86;
+    float: left;
+    margin: 0.08em 0.10em 0 -0.04em;
+    color: var(--terracotta);
+  }
+}
+
+/* Hanging article reference (marginalia in left/right gutter) */
+.hanging-ref {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ----------------------------------------------------------------------------
+ * 4. PAPER TEXTURE — subtle grain on body, switches off in print
+ * -------------------------------------------------------------------------- */
+
+.paper-grain {
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(circle at 0% 0%, rgba(204, 120, 92, 0.04) 0%, transparent 38%),
+    radial-gradient(circle at 100% 100%, rgba(26, 25, 21, 0.025) 0%, transparent 42%);
+  background-attachment: fixed;
+}
+
+/* ----------------------------------------------------------------------------
+ * 5. RISK-TIER COLORATION — set via .tier-XXX class on a wrapper
+ *    Components reference --t-bg / --t-fg / --t-ink without knowing the tier.
+ * -------------------------------------------------------------------------- */
+
+.tier-INTERDIT               { --t-bg: var(--tier-prohibited-bg); --t-fg: var(--tier-prohibited); --t-ink: var(--tier-prohibited-ink); --t-rule: rgba(181, 68, 60, 0.25); }
+.tier-HAUT_RISQUE_ANNEXE_I   { --t-bg: var(--tier-high-bg);       --t-fg: var(--tier-high);       --t-ink: var(--tier-high-ink);       --t-rule: rgba(204, 120, 92, 0.30); }
+.tier-HAUT_RISQUE_ANNEXE_III { --t-bg: var(--tier-high-bg);       --t-fg: var(--tier-high);       --t-ink: var(--tier-high-ink);       --t-rule: rgba(204, 120, 92, 0.30); }
+.tier-RISQUE_LIMITE          { --t-bg: var(--tier-limited-bg);    --t-fg: var(--tier-limited);    --t-ink: var(--tier-limited-ink);    --t-rule: rgba(200, 146, 58, 0.30); }
+.tier-RISQUE_MINIMAL         { --t-bg: var(--tier-minimal-bg);    --t-fg: var(--tier-minimal);    --t-ink: var(--tier-minimal-ink);    --t-rule: rgba(90, 122, 79, 0.30); }
+.tier-GPAI                   { --t-bg: var(--tier-gpai-bg);       --t-fg: var(--tier-gpai);       --t-ink: var(--tier-gpai-ink);       --t-rule: rgba(129, 91, 71, 0.30); }
+.tier-GPAI_RS                { --t-bg: var(--tier-gpai-rs-bg);    --t-fg: var(--tier-gpai-rs);    --t-ink: var(--tier-gpai-rs-ink);    --t-rule: rgba(92, 63, 46, 0.35); }
+
+/* ----------------------------------------------------------------------------
+ * 6. MOTION — orchestrated reveals with staggered delays
+ *    Honours prefers-reduced-motion.
+ * -------------------------------------------------------------------------- */
+
+@keyframes reveal-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes reveal-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes reveal-band {
+  from { opacity: 0; transform: scaleX(0.6); transform-origin: left center; }
+  to   { opacity: 1; transform: scaleX(1); }
+}
+@keyframes verdict-mark {
+  from { opacity: 0; transform: translateY(20px); letter-spacing: 0.12em; }
+  to   { opacity: 1; transform: translateY(0);    letter-spacing: -0.025em; }
+}
+
+.reveal       { animation: reveal-rise var(--dur-slow) var(--ease-out) both; }
+.reveal-fade  { animation: reveal-fade var(--dur-slow) var(--ease-out) both; }
+.reveal-band  { animation: reveal-band var(--dur-slow) var(--ease-out) both; }
+.reveal-mark  { animation: verdict-mark 720ms var(--ease-out) both; }
+
+.stagger-1 { animation-delay: 60ms; }
+.stagger-2 { animation-delay: 140ms; }
+.stagger-3 { animation-delay: 240ms; }
+.stagger-4 { animation-delay: 360ms; }
+.stagger-5 { animation-delay: 480ms; }
+.stagger-6 { animation-delay: 600ms; }
+.stagger-7 { animation-delay: 720ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .reveal-fade, .reveal-band, .reveal-mark,
+  .stagger-1, .stagger-2, .stagger-3, .stagger-4, .stagger-5, .stagger-6, .stagger-7 {
+    animation: none !important;
+  }
+}
+
+/* ----------------------------------------------------------------------------
+ * 7. FOCUS RING — uniform, accessible
+ * -------------------------------------------------------------------------- */
+
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--terracotta);
+  border-radius: 4px;
+  transition: box-shadow var(--dur-fast) var(--ease);
+}
+
+button, [role="button"], a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ----------------------------------------------------------------------------
+ * 8. PRINT — neutralise grain, motion, and any residual screen-only flourish
+ * -------------------------------------------------------------------------- */
+
+@media print {
+  body {
+    background: white !important;
+    font-variation-settings: 'opsz' 11, 'SOFT' 50;
+  }
+  .paper-grain { background-image: none !important; background-color: white !important; }
+  .reveal, .reveal-fade, .reveal-band, .reveal-mark { animation: none !important; opacity: 1 !important; transform: none !important; }
+  .drop-cap > p:first-of-type::first-letter,
+  .drop-cap-text::first-letter {
+    color: var(--ink) !important;
+  }
+}
+
+/* PDF export uses a dedicated HTML template (see buildPrintHTML in
+ * ai-act-compass.jsx) rather than capturing the screen DOM, so the
+ * pdf-export-mode shims that used to live here are no longer needed. */

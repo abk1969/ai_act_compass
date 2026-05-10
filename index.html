@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="AI Act Compass — qualification tool for Regulation (EU) 2024/1689. Determine the risk category of an AI system and obtain a tailored compliance roadmap." />
+    <title>AI Act Compass — Regulation (EU) 2024/1689</title>
+
+    <!-- Tailwind Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // Extend Tailwind with design tokens — drives utilities like
+      // bg-paper, text-ink-muted, border-rule, font-display, etc.
+      // CSS custom properties are defined in src/design/design.css.
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              paper: {
+                DEFAULT: 'var(--paper)',
+                tint:    'var(--paper-tint)',
+                shade:   'var(--paper-shade)',
+                deep:    'var(--paper-deep)',
+              },
+              ink: {
+                DEFAULT: 'var(--ink)',
+                soft:    'var(--ink-soft)',
+                muted:   'var(--ink-muted)',
+                faint:   'var(--ink-faint)',
+              },
+              rule: {
+                DEFAULT: 'var(--rule)',
+                soft:    'var(--rule-soft)',
+                strong:  'var(--rule-strong)',
+              },
+              terracotta: {
+                DEFAULT: 'var(--terracotta)',
+                soft:    'var(--terracotta-soft)',
+                deep:    'var(--terracotta-deep)',
+                ink:     'var(--terracotta-ink)',
+              },
+              tier: {
+                bg:  'var(--t-bg)',
+                fg:  'var(--t-fg)',
+                ink: 'var(--t-ink)',
+                rule:'var(--t-rule)',
+              },
+            },
+            fontFamily: {
+              display: ['Fraunces', 'Georgia', 'serif'],
+              serif:   ['Fraunces', 'Georgia', 'serif'],
+              mono:    ['JetBrains Mono', 'ui-monospace', 'monospace'],
+            },
+            letterSpacing: {
+              tightest: '-0.04em',
+              tight:    '-0.02em',
+            },
+            transitionTimingFunction: {
+              editorial: 'cubic-bezier(0.16, 1, 0.3, 1)',
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

@@ -1,0 +1,30 @@
+# Don't copy node_modules into the build context — we install fresh inside the image
+node_modules
+npm-debug.log*
+
+# Build output (we rebuild inside the image)
+dist
+build
+
+# Editor / OS / Claude
+.git
+.gitignore
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+.claude
+
+# Demo / test artefacts
+linkedin-demo.mp4
+linkedin-demo.webm
+_demo-tmp
+_pdf-check
+test-output
+ai-act-compass-*.pdf
+make-demo.cjs
+
+# Docs
+README.md
+LICENSE
+*.md
