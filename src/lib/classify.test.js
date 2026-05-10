@@ -127,3 +127,32 @@ describe('art. 50 — limited-risk transparency triggers', () => {
     });
   });
 });
+
+describe('art. 51-55 + art. 25 — GPAI', () => {
+  it('classifies a GPAI provider without systemic risk as GPAI', () => {
+    const result = computeCategory({
+      nature: 'gpai',
+      gpaiSystemic: 'non',
+    }, 'en');
+    expect(result.primary).toBe('GPAI');
+  });
+
+  it('classifies a GPAI provider with systemic risk as GPAI_RS', () => {
+    const result = computeCategory({
+      nature: 'gpai',
+      gpaiSystemic: 'oui',
+    }, 'en');
+    expect(result.primary).toBe('GPAI_RS');
+  });
+
+  it('does NOT apply GPAI categories to a third-party-GPAI integrator, but adds the art. 25/53 note', () => {
+    const result = computeCategory({
+      nature: 'systeme_sur_gpai',
+    }, 'en');
+    // No GPAI category — integrator is not the model provider
+    expect(result.primary).not.toBe('GPAI');
+    expect(result.primary).not.toBe('GPAI_RS');
+    // The art. 25 + art. 53 informational note must be present
+    expect(result.justifications.some(j => j.ref === 'art. 25 + art. 53')).toBe(true);
+  });
+});
