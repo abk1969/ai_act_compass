@@ -45,3 +45,6 @@ _pdf-check/
 test-output/
 ai-act-compass-*.pdf
 *-demo.png
+
+# Vitest coverage output
+coverage/
