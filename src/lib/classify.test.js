@@ -232,3 +232,46 @@ describe('i18n parity', () => {
     // that's by design, so we only assert structural parity, not ref equality.
   });
 });
+
+describe('French label branches — coverage for lang === "fr" ternary arms', () => {
+  // These tests exercise the French side of label ternaries that the rest of
+  // the matrix covers in English only. The functional decisions are identical
+  // across languages; we just need to hit the fr label branches.
+  it('profiling override emits the French label', () => {
+    const result = computeCategory({
+      annexIII: [3],
+      exceptions: ['narrow'],
+      profiling: true,
+    }, 'fr');
+    expect(result.primary).toBe('HAUT_RISQUE_ANNEXE_III');
+    const profilingNote = result.justifications.find(j => j.ref === 'art. 6(3) 2e al.');
+    expect(profilingNote).toBeDefined();
+    expect(profilingNote.label).toMatch(/Profilage de personnes physiques/);
+  });
+
+  it('art. 6(3) derogation emits the French label', () => {
+    const result = computeCategory({
+      annexIII: [3],
+      exceptions: ['narrow'],
+    }, 'fr');
+    const derogationNote = result.justifications.find(j => j.ref === 'art. 6(3)');
+    expect(derogationNote).toBeDefined();
+    expect(derogationNote.label).toMatch(/Exception applicable/);
+    expect(derogationNote.label).toMatch(/système retiré du haut risque/);
+  });
+
+  it('third-party-GPAI integrator note emits the French label', () => {
+    const result = computeCategory({ nature: 'systeme_sur_gpai' }, 'fr');
+    const integratorNote = result.justifications.find(j => j.ref === 'art. 25 + art. 53');
+    expect(integratorNote).toBeDefined();
+    expect(integratorNote.label).toMatch(/modèle GPAI tiers/);
+  });
+
+  it('minimal-risk fallback emits the French ref + label', () => {
+    const result = computeCategory({}, 'fr');
+    expect(result.primary).toBe('RISQUE_MINIMAL');
+    expect(result.justifications).toHaveLength(1);
+    expect(result.justifications[0].ref).toBe('analyse');
+    expect(result.justifications[0].label).toMatch(/Aucun déclencheur/);
+  });
+});
