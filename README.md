@@ -6,6 +6,7 @@
 ![status](https://img.shields.io/badge/status-decision--support-CC785C?style=flat-square)
 ![regulation](https://img.shields.io/badge/Regulation-(EU)%202024%2F1689-1A1915?style=flat-square)
 ![iso](https://img.shields.io/badge/anchor-ISO%2FIEC%2042001%20%2B%2027090-6E6A60?style=flat-square)
+[![tests](https://img.shields.io/github/actions/workflow/status/abk1969/ai_act_compass/test.yml?branch=main&label=tests&style=flat-square)](https://github.com/abk1969/ai_act_compass/actions/workflows/test.yml)
 
 ---
 
