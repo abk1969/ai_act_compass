@@ -5,6 +5,7 @@ import {
   Plane, Stethoscope, Network, Copy, Printer, Compass, ArrowRight, Globe,
   AlertCircle,
 } from 'lucide-react';
+import { t } from './src/lib/i18n.js';
 
 /* ============================================================================
  * AI ACT COMPASS — Bilingual Artifact (EN / FR)
@@ -19,13 +20,6 @@ import {
 
 const LangContext = createContext('en');
 const useLang = () => useContext(LangContext);
-
-// Translates a value: string passes through, {en, fr} object resolves by lang
-const t = (val, lang) => {
-  if (val == null) return '';
-  if (typeof val === 'string') return val;
-  return val[lang] ?? val.en ?? val.fr ?? '';
-};
 
 /* ---------------------------------------------------------------------------
  * UI STRINGS
