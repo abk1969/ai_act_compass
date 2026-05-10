@@ -117,3 +117,13 @@ describe('art. 6(3) 2nd al. — profiling override', () => {
     expect(result.justifications.some(j => j.ref === 'art. 6(3) 2e al.')).toBe(true);
   });
 });
+
+describe('art. 50 — limited-risk transparency triggers', () => {
+  ART50_TRIGGERS.forEach((trigger) => {
+    it(`returns RISQUE_LIMITE and cites ${trigger.ref} for trigger "${trigger.id}"`, () => {
+      const result = computeCategory({ art50: [trigger.id] }, 'en');
+      expect(result.primary).toBe('RISQUE_LIMITE');
+      expect(result.justifications.some(j => j.ref === trigger.ref)).toBe(true);
+    });
+  });
+});
