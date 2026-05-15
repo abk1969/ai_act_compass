@@ -6,6 +6,7 @@ import {
   ART50_TRIGGERS,
   ART5_CARVEOUTS,
 } from './classify.js';
+import { computeRoleNotes } from './classify.js';
 import { t } from './i18n.js';
 
 describe('classify.js — module surface', () => {
@@ -333,5 +334,74 @@ describe('French label branches — coverage for lang === "fr" ternary arms', ()
     expect(result.justifications).toHaveLength(1);
     expect(result.justifications[0].ref).toBe('analyse');
     expect(result.justifications[0].label).toMatch(/Aucun déclencheur/);
+  });
+});
+
+describe('computeRoleNotes — art. 27 FRIA applicability', () => {
+  const annexIII_3 = { annexIII: [3] };           // education
+  const annexIII_5 = { annexIII: [5] };           // essential services (5(b) credit / 5(c) insurance live here)
+  const annexIII_2 = { annexIII: [2] };           // critical infrastructure — excluded from FRIA
+
+  it('returns friaRequired=false for a provider regardless of tier', () => {
+    const notes = computeRoleNotes(annexIII_3, 'provider', 'en');
+    expect(notes.friaRequired).toBe(false);
+  });
+
+  it('returns friaRequired=true for a public-body deployer of Annex III §3', () => {
+    const notes = computeRoleNotes(
+      { ...annexIII_3, deployerKind: 'public_body' },
+      'deployer',
+      'en',
+    );
+    expect(notes.friaRequired).toBe(true);
+    expect(notes.friaReason.ref).toBe('art. 27(1)(a)');
+  });
+
+  it('returns friaRequired=true for a private-public-service deployer of Annex III §3', () => {
+    const notes = computeRoleNotes(
+      { ...annexIII_3, deployerKind: 'private_public_service' },
+      'deployer',
+      'en',
+    );
+    expect(notes.friaRequired).toBe(true);
+    expect(notes.friaReason.ref).toBe('art. 27(1)(a)');
+  });
+
+  it('returns friaRequired=false for a public-body deployer of Annex III §2 (critical infrastructure)', () => {
+    const notes = computeRoleNotes(
+      { ...annexIII_2, deployerKind: 'public_body' },
+      'deployer',
+      'en',
+    );
+    expect(notes.friaRequired).toBe(false);
+  });
+
+  it('returns friaRequired=true for any deployer of Annex III §5 (credit/insurance pathway)', () => {
+    const notes = computeRoleNotes(
+      { ...annexIII_5, deployerKind: 'private_other' },
+      'deployer',
+      'en',
+    );
+    expect(notes.friaRequired).toBe(true);
+    expect(notes.friaReason.ref).toBe('art. 27(1)(b)');
+  });
+
+  it('returns friaRequired=false when system is not high-risk (no Annex III selected)', () => {
+    const notes = computeRoleNotes(
+      { annexIII: [], deployerKind: 'public_body' },
+      'deployer',
+      'en',
+    );
+    expect(notes.friaRequired).toBe(false);
+  });
+
+  it('emits a French label when lang === "fr"', () => {
+    const notes = computeRoleNotes(
+      { annexIII: [5], deployerKind: 'private_other' },
+      'deployer',
+      'fr',
+    );
+    expect(notes.friaRequired).toBe(true);
+    expect(notes.friaReason.label).toMatch(/FRIA|évaluation d'impact/i);
   });
 });

@@ -365,3 +365,40 @@ export function computeCategory(answers, lang) {
 
   return { primary: sorted[0], secondary: sorted.slice(1), justifications };
 }
+
+// art. 27(1) FRIA applicability — pure, side-effect-free.
+// Returns { friaRequired: boolean, friaReason: { ref, label } | null }.
+//
+// FRIA binds DEPLOYERS only, when EITHER:
+//   (a) the deployer is a body governed by public law, or a private entity
+//       providing public services, AND the system falls under Annex III
+//       (excluding §2 critical infrastructure), OR
+//   (b) the system is an Annex III §5(b) credit-scoring or §5(c) life/health
+//       insurance system, regardless of deployer kind.
+export function computeRoleNotes(answers, role, lang) {
+  const friaA = lang === 'en'
+    ? 'FRIA required before first use (deployer is public body / private provider of public services and system is Annex III other than §2).'
+    : 'FRIA requise avant première utilisation (déployeur public ou privé chargé d\'un service public, et système Annexe III hors §2).';
+  const friaB = lang === 'en'
+    ? 'FRIA required before first use (Annex III §5 credit-scoring or life/health-insurance pathway — applies regardless of deployer kind).'
+    : 'FRIA requise avant première utilisation (Annexe III §5 — scoring de crédit ou tarification vie/santé — applicable quel que soit le type de déployeur).';
+
+  if (role !== 'deployer') return { friaRequired: false, friaReason: null };
+
+  const areas = answers.annexIII || [];
+  const inAnnexIIIOtherThan2 = areas.some(id => id !== 2 && id >= 1 && id <= 8);
+  const inAnnexIII5 = areas.includes(5);
+
+  // Path (b) is checked first — it overrides deployer-kind filtering.
+  if (inAnnexIII5) {
+    return { friaRequired: true, friaReason: { ref: 'art. 27(1)(b)', label: friaB } };
+  }
+
+  const kind = answers.deployerKind;
+  const isPublicLike = kind === 'public_body' || kind === 'private_public_service';
+  if (isPublicLike && inAnnexIIIOtherThan2) {
+    return { friaRequired: true, friaReason: { ref: 'art. 27(1)(a)', label: friaA } };
+  }
+
+  return { friaRequired: false, friaReason: null };
+}
