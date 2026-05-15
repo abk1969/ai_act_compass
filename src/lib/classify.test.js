@@ -409,7 +409,7 @@ describe('computeRoleNotes — art. 27 FRIA applicability', () => {
 describe('art. 25 — substantial-modification provider flip', () => {
   it('keeps the integrator note when substantialModification is unset', () => {
     const result = computeCategory({ nature: 'systeme_sur_gpai' }, 'en');
-    expect(result.primary).not.toBe('GPAI');
+    expect(result.primary).toBe('RISQUE_MINIMAL');
     expect(result.justifications.some(j => j.ref === 'art. 25 + art. 53')).toBe(true);
   });
 
@@ -418,7 +418,7 @@ describe('art. 25 — substantial-modification provider flip', () => {
       nature: 'systeme_sur_gpai',
       substantialModification: 'non',
     }, 'en');
-    expect(result.primary).not.toBe('GPAI');
+    expect(result.primary).toBe('RISQUE_MINIMAL');
     expect(result.justifications.some(j => j.ref === 'art. 25 + art. 53')).toBe(true);
   });
 
@@ -449,5 +449,15 @@ describe('art. 25 — substantial-modification provider flip', () => {
     const flip = result.justifications.find(j => j.ref === 'art. 25');
     expect(flip).toBeDefined();
     expect(flip.label).toMatch(/modification substantielle/i);
+  });
+
+  it('does NOT emit the art. 25 flip note for a native GPAI provider (no flip needed)', () => {
+    const result = computeCategory({
+      nature: 'gpai',
+      substantialModification: 'oui',   // irrelevant for a native provider
+    }, 'en');
+    expect(result.primary).toBe('GPAI');
+    // The art. 25 flip note is reserved for the integrator-flip path
+    expect(result.justifications.some(j => j.ref === 'art. 25')).toBe(false);
   });
 });
