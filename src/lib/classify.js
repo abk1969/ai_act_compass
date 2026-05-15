@@ -84,6 +84,9 @@ export const PROHIBITED_PRACTICES = [
   },
 ];
 
+// Each carve-out has a unique `id` and an `appliesTo` pointing to the prohibition it gates.
+// They coincide today (1:1 mapping) but are kept separate so future carve-outs can gate
+// multiple prohibitions or share a target.
 export const ART5_CARVEOUTS = [
   {
     id: 'h',
@@ -258,19 +261,16 @@ export function computeCategory(answers, lang) {
     const carvedOutRefs = [];
     answers.prohibitions.forEach(id => {
       const p = PROHIBITED_PRACTICES.find(x => x.id === id);
-      if (carveOuts[id]) {
-        const co = ART5_CARVEOUTS.find(c => c.appliesTo === id);
-        if (co) carvedOutRefs.push({ ref: co.ref, label: t(co.label, lang) });
+      const co = carveOuts[id] ? ART5_CARVEOUTS.find(c => c.appliesTo === id) : null;
+      if (co) {
+        carvedOutRefs.push({ ref: co.ref, label: t(co.label, lang) });
       } else {
         interdictedRefs.push({ ref: p.ref, label: t(p.label, lang) });
       }
     });
     if (interdictedRefs.length > 0) {
-      // At least one un-carved-out prohibition remains → still INTERDIT.
       return { primary: 'INTERDIT', secondary: null, justifications: interdictedRefs };
     }
-    // Every selected prohibition has a claimed carve-out → fall through to the
-    // rest of the classification tree, preserving the carve-out trace.
     carvedOutRefs.forEach(j => justifications.push(j));
   }
 

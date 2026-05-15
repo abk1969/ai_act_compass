@@ -245,7 +245,7 @@ describe('ART5_CARVEOUTS — exported metadata', () => {
 });
 
 describe('art. 5 carve-outs — INTERDIT filtering', () => {
-  it('returns INTERDIT when carve-out is claimed but prohibition (h) has no carveOut flag', () => {
+  it('returns INTERDIT when no carve-out is claimed for prohibition (h)', () => {
     const result = computeCategory({ prohibitions: ['h'] }, 'en');
     expect(result.primary).toBe('INTERDIT');
   });
@@ -279,6 +279,17 @@ describe('art. 5 carve-outs — INTERDIT filtering', () => {
     expect(result.primary).toBe('RISQUE_MINIMAL');
     expect(result.justifications.some(j => j.ref === 'art. 5(1)(f) parenthetical')).toBe(true);
     expect(result.justifications.some(j => j.ref === 'art. 5(1)(g) parenthetical')).toBe(true);
+    expect(result.justifications).toHaveLength(2);
+  });
+
+  it('silently ignores a carve-out claimed for a prohibition with no carve-out path (e.g. "a")', () => {
+    const result = computeCategory({
+      prohibitions: ['a'],
+      prohibitionCarveOuts: { a: true },  // 'a' has no ART5_CARVEOUTS entry
+    }, 'en');
+    // Carve-out is unmapped — the prohibition still lands in INTERDIT.
+    expect(result.primary).toBe('INTERDIT');
+    expect(result.justifications.some(j => j.ref === 'art. 5(1)(a)')).toBe(true);
   });
 });
 
