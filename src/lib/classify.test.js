@@ -591,4 +591,14 @@ describe('art. 50(4) §2 — human-edit exemption for AI-generated public-intere
     expect(carveOut).toBeDefined();
     expect(carveOut.label).toMatch(/édition humaine|revue éditoriale/i);
   });
+
+  it('is a no-op when art50TextHumanEdit is set but genai_text is not selected', () => {
+    const result = computeCategory({
+      art50: ['interaction'],
+      art50TextHumanEdit: 'oui',
+    }, 'en');
+    expect(result.primary).toBe('RISQUE_LIMITE');
+    expect(result.justifications.some(j => j.ref === 'art. 50(4) §2 carve-out')).toBe(false);
+    expect(result.justifications.some(j => j.ref === 'art. 50(1)')).toBe(true);
+  });
 });
