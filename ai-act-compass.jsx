@@ -604,6 +604,7 @@ const CHECKLIST = {
       { ref: 'art. 50(3)', txt: _('Inform subjects of biometric categorisation or emotion recognition', 'Information du sujet de catégorisation biométrique ou reconnaissance émotionnelle') },
       { ref: 'art. 50(4)', txt: _('"Deepfake" label on manipulated image/audio/video content', 'Label « deepfake » sur contenus image/audio/vidéo manipulés') },
       { ref: 'art. 50(4) §2', txt: _('Synthetic public-interest text labelling (except human-edited)', 'Étiquetage du texte synthétique d\'intérêt public (sauf édition humaine)') },
+      { ref: 'art. 50(5)', txt: _('Transparency information must be clear, distinguishable, provided at the latest at first interaction/exposure, and accessible (incl. WCAG-level accessibility for persons with disabilities where applicable)', 'Information de transparence : claire, distinguable, fournie au plus tard à la 1ʳᵉ interaction/exposition, et accessible (incl. niveau WCAG pour personnes en situation de handicap si applicable)') },
     ]},
     { pilier: _('AI literacy', 'AI literacy'), items: [
       { ref: 'art. 4', txt: _('AI literacy programme applicable since 2025-02-02', 'Programme AI literacy applicable depuis 2025-02-02') },
