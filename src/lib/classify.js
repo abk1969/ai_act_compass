@@ -325,10 +325,10 @@ export function computeCategory(answers, lang) {
   const flipsViaArt25 = isOnGPAI && answers.substantialModification === 'oui';
   const isGPAI_RS = (isGPAIProvider || flipsViaArt25) && answers.gpaiSystemic === 'oui';
 
-  if (answers.annexI === 'oui') {
+  if (answers.annexICoverage === 'oui' && answers.annexI3rdPartyCA === 'oui') {
     justifications.push({
       ref: lang === 'en' ? 'art. 6(1) + Annex I' : 'art. 6(1) + Annexe I',
-      label: lang === 'en' ? 'Safety component of a harmonised product' : 'Composant de sécurité de produit harmonisé',
+      label: lang === 'en' ? 'Safety component of a harmonised product subject to third-party conformity assessment' : 'Composant de sécurité de produit harmonisé soumis à évaluation de conformité par tiers',
     });
     categories.push('HAUT_RISQUE_ANNEXE_I');
   }
