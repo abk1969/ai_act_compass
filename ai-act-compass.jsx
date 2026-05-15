@@ -92,8 +92,8 @@ const UI = {
   q4NoDesc:        { en: 'My system does not fall within the scope of Annex I.', fr: 'Mon système n\'entre pas dans le champ de l\'Annexe I.' },
   q5Title:         { en: 'Annex III domains',                       fr: 'Domaines de l\'Annexe III' },
   q5Sub:           {
-    en: 'Tick any applicable domain. If one or more is ticked, Article 6(3) exceptions will be presented below.',
-    fr: 'Cochez tout domaine applicable à votre cas d\'usage. Si un ou plusieurs sont cochés, des exceptions de l\'article 6(3) seront proposées à l\'étape suivante.',
+    en: 'Tick any applicable domain. If one or more is ticked, Article 6(3) exceptions will be presented below. Note: regimes are cumulative — tick §1 biometrics here even if you already ticked an art. 5 prohibition (step 3) or an art. 50 transparency trigger (step 6) for the same underlying technology. Each step tests a distinct legal regime.',
+    fr: 'Cochez tout domaine applicable à votre cas d\'usage. Si un ou plusieurs sont cochés, des exceptions de l\'article 6(3) seront proposées à l\'étape suivante. Note : les régimes sont cumulatifs — cochez §1 biométrie ici même si vous avez déjà coché une interdiction art. 5 (étape 3) ou un déclencheur de transparence art. 50 (étape 6) pour la même brique technique. Chaque étape teste un régime juridique distinct.',
   },
   q5ExceptionsKicker: { en: 'Article 6(3) exceptions',              fr: 'Exceptions article 6(3)' },
   q5ExceptionsTitle: { en: 'Does an exception apply?',              fr: 'Une exception s\'applique-t-elle ?' },
@@ -113,12 +113,12 @@ const UI = {
   },
   q7Title:         { en: 'GPAI with systemic risk?',                fr: 'GPAI à risque systémique ?' },
   q7Sub:           {
-    en: 'Relevant only if your system is a GPAI model (cf. step 2). The presumed threshold is 10^25 cumulative floating-point operations at training (art. 51(2)).',
-    fr: 'Question pertinente uniquement si votre système est un modèle GPAI (cf. étape 2). Le seuil présomptif est de 10^25 opérations en virgule flottante cumulées à l\'entraînement (art. 51(2)).',
+    en: 'Relevant if your system is a GPAI model (cf. step 2), OR if you have substantially modified a third-party GPAI under art. 25 (cf. step 2). The presumed threshold is 10^25 cumulative floating-point operations at training (art. 51(2)).',
+    fr: 'Pertinent si votre système est un modèle GPAI (cf. étape 2), OU si vous avez substantiellement modifié un modèle GPAI tiers au sens de l\'art. 25 (cf. étape 2). Le seuil présomptif est de 10^25 opérations en virgule flottante cumulées à l\'entraînement (art. 51(2)).',
   },
   q7NotApplicable: {
-    en: 'This step does not apply to your case (your system is not a GPAI). You may proceed directly to the verdict.',
-    fr: 'Cette étape n\'est pas applicable à votre cas (votre système n\'est pas un GPAI). Vous pouvez passer directement au verdict.',
+    en: 'This step does not apply to your case (you are neither a GPAI provider nor a substantially-modifying integrator). You may proceed directly to the verdict.',
+    fr: 'Cette étape n\'est pas applicable à votre cas (vous n\'êtes ni fournisseur GPAI, ni intégrateur modifiant substantiellement un modèle tiers). Vous pouvez passer directement au verdict.',
   },
   q7YesTitle:      { en: 'Yes — model with systemic risk',          fr: 'Oui — modèle à risque systémique' },
   q7YesDesc:       {
@@ -1893,8 +1893,23 @@ export default function App() {
   const next = () => setStep(s => s + 1);
   const back = () => setStep(s => Math.max(0, s - 1));
   const goToResultIfProhibited = () => {
-    if (answers.prohibitions && answers.prohibitions.length > 0) setStep(TOTAL_STEPS + 1);
-    else next();
+    const prohibitions = answers.prohibitions || [];
+    const carveOuts = answers.prohibitionCarveOuts || {};
+    // Short-circuit to verdict only if at least one selected prohibition has no
+    // claimed (and matched) carve-out — otherwise the user still needs to walk
+    // through Annex I/III/50/GPAI to produce a meaningful verdict. PR #3 (Item A)
+    // introduced the carve-out path; without this check the short-circuit
+    // bypasses those steps and the verdict falls to RISQUE_MINIMAL incorrectly.
+    const hasUnCarvedOutProhibition = prohibitions.some(id => {
+      const carveOutClaimed = !!carveOuts[id];
+      const carveOutExists = ART5_CARVEOUTS.some(c => c.appliesTo === id);
+      return !(carveOutClaimed && carveOutExists);
+    });
+    if (prohibitions.length > 0 && hasUnCarvedOutProhibition) {
+      setStep(TOTAL_STEPS + 1);
+    } else {
+      next();
+    }
   };
 
   return (
@@ -2351,17 +2366,25 @@ export default function App() {
             </QuestionFrame>
           )}
 
-          {step === 7 && (
+          {step === 7 && (() => {
+            // art. 27 + art. 51-55 — GPAI systemic-risk question applies to native
+            // GPAI providers AND to integrators flipped to provider via art. 25
+            // (PR #3 D1). Without this, the GPAI_RS path is unreachable from the
+            // integrator flow even at 10^25 FLOPs.
+            const gpaiQuestionApplicable =
+              answers.nature === 'gpai' ||
+              (answers.nature === 'systeme_sur_gpai' && answers.substantialModification === 'oui');
+            return (
             <QuestionFrame
               stepNum={7} totalSteps={TOTAL_STEPS}
               title={t(UI.q7Title, lang)}
               subtitle={t(UI.q7Sub, lang)}
-              canNext={answers.nature !== 'gpai' || answers.gpaiSystemic !== null}
+              canNext={!gpaiQuestionApplicable || answers.gpaiSystemic !== null}
               onNext={() => setStep(TOTAL_STEPS + 1)}
               onBack={back}
               nextLabel={t(UI.viewVerdict, lang)}
             >
-              {answers.nature === 'gpai' ? (
+              {gpaiQuestionApplicable ? (
                 <div className="space-y-3">
                   <OptionCard
                     selected={answers.gpaiSystemic === 'oui'}
@@ -2384,7 +2407,8 @@ export default function App() {
                 </div>
               )}
             </QuestionFrame>
-          )}
+            );
+          })()}
 
           {step === TOTAL_STEPS + 1 && (
             <Result answers={answers} result={result} onRestart={restart} />
