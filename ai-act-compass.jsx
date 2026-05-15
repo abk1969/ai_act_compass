@@ -1649,6 +1649,10 @@ function Result({ answers, result, onRestart }) {
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'auto' }); }, []);
 
   const meta = CATEGORIES_META[result.primary];
+  const roleNotes = useMemo(
+    () => computeRoleNotes(answers, answers.role, lang),
+    [answers, lang],
+  );
   const QW = QUICKWINS[result.primary] || [];
   const gatedQW = QW.filter(item => {
     const isFria = (item.refs || []).some(r => (typeof r === 'string' ? r : '') === 'art. 27');
@@ -2190,10 +2194,6 @@ export default function App() {
   }, []);
 
   const result = useMemo(() => computeCategory(answers, lang), [answers, lang]);
-  const roleNotes = useMemo(
-    () => computeRoleNotes(answers, answers.role, lang),
-    [answers, lang],
-  );
 
   const restart = () => {
     setAnswers({
