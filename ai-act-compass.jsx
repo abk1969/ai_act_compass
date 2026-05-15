@@ -2361,7 +2361,9 @@ export default function App() {
                       onClick={() => {
                         const cur = answers.prohibitions || [];
                         const upd = sel ? cur.filter(x => x !== p.id) : [...cur, p.id];
-                        setAnswers({ ...answers, prohibitions: upd });
+                        const carveOuts = { ...(answers.prohibitionCarveOuts || {}) };
+                        if (sel) delete carveOuts[p.id];
+                        setAnswers({ ...answers, prohibitions: upd, prohibitionCarveOuts: carveOuts });
                       }}
                       title={t(p.label, lang)} sub={p.ref} desc={t(p.desc, lang)}
                     />
