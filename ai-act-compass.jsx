@@ -11,6 +11,7 @@ import {
   PROHIBITED_PRACTICES,
   ANNEX_III_AREAS,
   ART50_TRIGGERS,
+  ART5_CARVEOUTS,
 } from './src/lib/classify.js';
 
 /* ============================================================================
@@ -2152,7 +2153,7 @@ export default function App() {
   const [lang, setLang] = useState('en'); // EN by default
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({
-    role: null, nature: null, prohibitions: null, annexI: null,
+    role: null, nature: null, prohibitions: null, prohibitionCarveOuts: {}, annexI: null,
     annexIII: [], exceptions: null, profiling: false, art50: [], gpaiSystemic: null,
   });
 
@@ -2175,7 +2176,7 @@ export default function App() {
 
   const restart = () => {
     setAnswers({
-      role: null, nature: null, prohibitions: null, annexI: null,
+      role: null, nature: null, prohibitions: null, prohibitionCarveOuts: {}, annexI: null,
       annexIII: [], exceptions: null, profiling: false, art50: [], gpaiSystemic: null,
     });
     setStep(0);
@@ -2301,6 +2302,31 @@ export default function App() {
                   />
                 </div>
               </div>
+              {(answers.prohibitions || []).some(id => ART5_CARVEOUTS.some(c => c.appliesTo === id)) && (
+                <div className="mt-6 space-y-2">
+                  <div className="text-sm uppercase tracking-wider opacity-60">
+                    {lang === 'en' ? 'Article 5 carve-outs (optional)' : 'Exceptions article 5 (facultatives)'}
+                  </div>
+                  {ART5_CARVEOUTS
+                    .filter(c => (answers.prohibitions || []).includes(c.appliesTo))
+                    .map(c => (
+                      <OptionCard
+                        key={`carveout-${c.id}`}
+                        selected={!!(answers.prohibitionCarveOuts || {})[c.id]}
+                        onClick={() => setAnswers({
+                          ...answers,
+                          prohibitionCarveOuts: {
+                            ...(answers.prohibitionCarveOuts || {}),
+                            [c.id]: !((answers.prohibitionCarveOuts || {})[c.id]),
+                          },
+                        })}
+                        title={t(c.label, lang)}
+                        sub={c.ref}
+                        desc={t(c.desc, lang)}
+                      />
+                    ))}
+                </div>
+              )}
             </QuestionFrame>
           )}
 
