@@ -8,6 +8,7 @@ import {
 import { t } from './src/lib/i18n.js';
 import {
   computeCategory,
+  computeRoleNotes,
   PROHIBITED_PRACTICES,
   ANNEX_III_AREAS,
   ART50_TRIGGERS,
@@ -1305,7 +1306,7 @@ function PrintSection({ icon: Icon, title, breakBefore = true, children }) {
   );
 }
 
-function generateReport(answers, result, lang) {
+function generateReport(answers, result, lang, friaRequired = false) {
   const meta = CATEGORIES_META[result.primary];
   const role = ROLES.find(r => r.id === answers.role);
   const lines = [];
@@ -1324,7 +1325,10 @@ function generateReport(answers, result, lang) {
   result.justifications.forEach(j => lines.push(`  - [${j.ref}] ${j.label}`));
   lines.push('');
   lines.push(t(UI.reportQuickwins, lang));
-  (QUICKWINS[result.primary] || []).forEach((q, i) => {
+  (QUICKWINS[result.primary] || []).filter(q => {
+    const isFria = (q.refs || []).some(r => (typeof r === 'string' ? r : '') === 'art. 27');
+    return !isFria || friaRequired;
+  }).forEach((q, i) => {
     lines.push(`  ${i + 1}. ${t(q.titre, lang)} [${t(q.delai, lang)}]`);
     lines.push(`     ${t(q.action, lang)}`);
     lines.push(`     ${t(UI.reportRefs, lang)} : ${q.refs.map(r => t(r, lang)).join(' | ')}`);
@@ -1367,11 +1371,14 @@ const htmlEscape = (s) => String(s ?? '').replace(/[&<>"']/g, c => (
   { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
 ));
 
-function buildPrintHTML({ result, answers, lang, today, checked }) {
+function buildPrintHTML({ result, answers, lang, today, checked, friaRequired = false }) {
   const meta = CATEGORIES_META[result.primary];
   const role = ROLES.find(r => r.id === answers.role);
   const nature = NATURES.find(n => n.id === answers.nature);
-  const QW = QUICKWINS[result.primary] || [];
+  const QW = (QUICKWINS[result.primary] || []).filter(q => {
+    const isFria = (q.refs || []).some(r => (typeof r === 'string' ? r : '') === 'art. 27');
+    return !isFria || friaRequired;
+  });
   const CL = CHECKLIST[result.primary] || [];
   const extraCL = (result.secondary || []).map(s => ({ cat: s, items: CHECKLIST[s] || [] }));
   const applicableTimeline = TIMELINE.filter(m =>
@@ -1643,6 +1650,10 @@ function Result({ answers, result, onRestart }) {
 
   const meta = CATEGORIES_META[result.primary];
   const QW = QUICKWINS[result.primary] || [];
+  const gatedQW = QW.filter(item => {
+    const isFria = (item.refs || []).some(r => (typeof r === 'string' ? r : '') === 'art. 27');
+    return !isFria || roleNotes.friaRequired;
+  });
   const CL = CHECKLIST[result.primary] || [];
   const role = ROLES.find(r => r.id === answers.role);
   const nature = NATURES.find(n => n.id === answers.nature);
@@ -1655,7 +1666,7 @@ function Result({ answers, result, onRestart }) {
   );
 
   const handleCopy = async () => {
-    const txt = generateReport(answers, result, lang);
+    const txt = generateReport(answers, result, lang, roleNotes.friaRequired);
     // Tentative API moderne (nécessite un contexte sécurisé HTTPS)
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -1710,7 +1721,7 @@ function Result({ answers, result, onRestart }) {
     setPdfBusy(true);
 
     // 1. Build print CSS + HTML
-    const { css, html } = buildPrintHTML({ result, answers, lang, today, checked });
+    const { css, html } = buildPrintHTML({ result, answers, lang, today, checked, friaRequired: roleNotes.friaRequired });
 
     // 2. Inject the HTML into a hidden sandbox AND inject the <style> inside
     //    .aac-print itself (as the LAST child, after content) so html2canvas
@@ -2053,7 +2064,12 @@ ${reportHTML}
                 >
                   {t(UI.quickwinsIntro, lang)}
                 </p>
-                <QuickwinsList items={QW} />
+                {roleNotes.friaRequired && roleNotes.friaReason?.label && (
+                  <p className="text-[13px] text-ink-muted mb-5 italic opacity-70">
+                    {lang === 'en' ? 'FRIA note: ' : 'Note FRIA : '}{roleNotes.friaReason.label}
+                  </p>
+                )}
+                <QuickwinsList items={gatedQW} />
               </div>
             )}
             {tab === 'checklist' && (
@@ -2079,7 +2095,7 @@ ${reportHTML}
        * Cachée à l'écran, déployée uniquement à l'impression.
        * ========================================================== */}
       <PrintSection icon={Zap} title={t(UI.printSectionQW, lang)}>
-        <QuickwinsList items={QW} />
+        <QuickwinsList items={gatedQW} />
       </PrintSection>
 
       <PrintSection icon={ListChecks} title={t(UI.printSectionCL, lang)}>
@@ -2155,6 +2171,7 @@ export default function App() {
   const [answers, setAnswers] = useState({
     role: null, nature: null, prohibitions: null, prohibitionCarveOuts: {}, annexI: null,
     annexIII: [], exceptions: null, profiling: false, art50: [], gpaiSystemic: null,
+    deployerKind: null,
   });
 
   // Fonts (Fraunces variable + JetBrains Mono) are loaded via @import in
@@ -2173,11 +2190,16 @@ export default function App() {
   }, []);
 
   const result = useMemo(() => computeCategory(answers, lang), [answers, lang]);
+  const roleNotes = useMemo(
+    () => computeRoleNotes(answers, answers.role, lang),
+    [answers, lang],
+  );
 
   const restart = () => {
     setAnswers({
       role: null, nature: null, prohibitions: null, prohibitionCarveOuts: {}, annexI: null,
       annexIII: [], exceptions: null, profiling: false, art50: [], gpaiSystemic: null,
+      deployerKind: null,
     });
     setStep(0);
   };
@@ -2243,6 +2265,31 @@ export default function App() {
                   />
                 ))}
               </div>
+              {answers.role === 'deployeur' && (
+                <div className="mt-6 space-y-2">
+                  <div className="text-sm uppercase tracking-wider opacity-60">
+                    {lang === 'en' ? 'Deployer kind (art. 27 gating)' : 'Type de déployeur (gating art. 27)'}
+                  </div>
+                  <OptionCard
+                    selected={answers.deployerKind === 'public_body'}
+                    onClick={() => setAnswers({ ...answers, deployerKind: 'public_body' })}
+                    title={lang === 'en' ? 'Body governed by public law' : 'Organisme de droit public'}
+                    desc={lang === 'en' ? 'Public administration, public agency, state-owned entity.' : 'Administration publique, agence publique, entité étatique.'}
+                  />
+                  <OptionCard
+                    selected={answers.deployerKind === 'private_public_service'}
+                    onClick={() => setAnswers({ ...answers, deployerKind: 'private_public_service' })}
+                    title={lang === 'en' ? 'Private entity providing public services' : 'Entité privée fournissant un service public'}
+                    desc={lang === 'en' ? 'Operator of public service under delegation/concession.' : 'Opérateur de service public en délégation/concession.'}
+                  />
+                  <OptionCard
+                    selected={answers.deployerKind === 'private_other'}
+                    onClick={() => setAnswers({ ...answers, deployerKind: 'private_other' })}
+                    title={lang === 'en' ? 'Other private deployer' : 'Autre déployeur privé'}
+                    desc={lang === 'en' ? 'No public-service mandate.' : 'Sans mission de service public.'}
+                  />
+                </div>
+              )}
             </QuestionFrame>
           )}
 
