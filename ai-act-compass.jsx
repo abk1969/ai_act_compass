@@ -2173,7 +2173,7 @@ export default function App() {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({
     role: null, nature: null, prohibitions: null, prohibitionCarveOuts: {}, annexICoverage: null, annexI3rdPartyCA: null,
-    annexIII: [], annexIII5Subitems: [], exceptions: null, profiling: false, art50: [], gpaiSystemic: null,
+    annexIII: [], annexIII5Subitems: [], exceptions: null, profiling: false, art50: [], art50TextHumanEdit: null, gpaiSystemic: null,
     deployerKind: null, substantialModification: null,
   });
 
@@ -2197,7 +2197,7 @@ export default function App() {
   const restart = () => {
     setAnswers({
       role: null, nature: null, prohibitions: null, prohibitionCarveOuts: {}, annexICoverage: null, annexI3rdPartyCA: null,
-      annexIII: [], annexIII5Subitems: [], exceptions: null, profiling: false, art50: [], gpaiSystemic: null,
+      annexIII: [], annexIII5Subitems: [], exceptions: null, profiling: false, art50: [], art50TextHumanEdit: null, gpaiSystemic: null,
       deployerKind: null, substantialModification: null,
     });
     setStep(0);
@@ -2624,13 +2624,43 @@ export default function App() {
                       onClick={() => {
                         const cur = answers.art50;
                         const upd = sel ? cur.filter(x => x !== tr.id) : [...cur, tr.id];
-                        setAnswers({ ...answers, art50: upd });
+                        setAnswers({
+                          ...answers,
+                          art50: upd,
+                          art50TextHumanEdit: upd.includes('genai_text') ? answers.art50TextHumanEdit : null,
+                        });
                       }}
                       title={t(tr.label, lang)} sub={tr.ref} desc={t(tr.desc, lang)}
                     />
                   );
                 })}
               </div>
+
+              {(answers.art50 || []).includes('genai_text') && (
+                <div className="mt-6 space-y-2">
+                  <div className="text-sm uppercase tracking-wider opacity-60">
+                    {lang === 'en' ? 'Human review carve-out (art. 50(4) §2)' : 'Exception revue humaine (art. 50(4) §2)'}
+                  </div>
+                  <div className="text-xs opacity-70">
+                    {lang === 'en'
+                      ? 'art. 50(4) second subparagraph: the labelling obligation does NOT apply where the AI-generated text has undergone human review or editorial control and a natural/legal person holds editorial responsibility.'
+                      : 'art. 50(4) deuxième alinéa : l\'obligation d\'étiquetage NE s\'applique PAS lorsque le texte généré a fait l\'objet d\'une revue ou d\'un contrôle éditorial humain et qu\'une personne physique/morale en assume la responsabilité éditoriale.'}
+                  </div>
+                  <OptionCard
+                    selected={answers.art50TextHumanEdit === 'oui'}
+                    onClick={() => setAnswers({ ...answers, art50TextHumanEdit: 'oui' })}
+                    title={lang === 'en' ? 'Yes — under editorial responsibility' : 'Oui — sous responsabilité éditoriale'}
+                    sub="art. 50(4) §2"
+                    desc={lang === 'en' ? 'Transparency obligation does not apply for this text channel.' : 'L\'obligation de transparence ne s\'applique pas pour ce canal de texte.'}
+                  />
+                  <OptionCard
+                    selected={answers.art50TextHumanEdit === 'non'}
+                    onClick={() => setAnswers({ ...answers, art50TextHumanEdit: 'non' })}
+                    title={lang === 'en' ? 'No — fully automated publication' : 'Non — publication entièrement automatisée'}
+                    desc={lang === 'en' ? 'Standard art. 50(4) §2 labelling applies.' : 'L\'étiquetage standard art. 50(4) §2 s\'applique.'}
+                  />
+                </div>
+              )}
             </QuestionFrame>
           )}
 

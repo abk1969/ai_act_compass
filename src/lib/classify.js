@@ -369,11 +369,22 @@ export function computeCategory(answers, lang) {
   }
 
   const triggers = answers.art50 || [];
-  if (triggers.length > 0) {
-    triggers.forEach(id => {
+  const textHumanEdit = answers.art50TextHumanEdit === 'oui';
+  const effectiveTriggers = textHumanEdit ? triggers.filter(id => id !== 'genai_text') : triggers;
+  triggers.forEach(id => {
+    if (id === 'genai_text' && textHumanEdit) {
+      justifications.push({
+        ref: 'art. 50(4) §2 carve-out',
+        label: lang === 'en'
+          ? 'AI-generated public-interest text is under human review / editorial control — art. 50(4) §2 transparency obligation does not apply (counsel verification required).'
+          : 'Texte généré d\'intérêt public sous revue / édition humaine — l\'obligation de transparence art. 50(4) §2 ne s\'applique pas (vérification juridique requise).',
+      });
+    } else {
       const tr = ART50_TRIGGERS.find(x => x.id === id);
       if (tr) justifications.push({ ref: tr.ref, label: t(tr.label, lang) });
-    });
+    }
+  });
+  if (effectiveTriggers.length > 0) {
     categories.push('RISQUE_LIMITE');
   }
 
