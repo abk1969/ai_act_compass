@@ -493,6 +493,11 @@ const QUICKWINS = {
   ],
 };
 
+// Identifies the art. 27 FRIA quickwin so it can be gated by computeRoleNotes.
+// Keep this in sync with QUICKWINS.HAUT_RISQUE_ANNEXE_III; if other quickwins
+// ever cite art. 27 for unrelated reasons, this predicate needs tightening.
+const isFriaItem = (item) => (item.refs || []).some(r => r === 'art. 27');
+
 /* ---------------------------------------------------------------------------
  * CHECKLIST by category
  * ------------------------------------------------------------------------- */
@@ -1325,10 +1330,9 @@ function generateReport(answers, result, lang, friaRequired = false) {
   result.justifications.forEach(j => lines.push(`  - [${j.ref}] ${j.label}`));
   lines.push('');
   lines.push(t(UI.reportQuickwins, lang));
-  (QUICKWINS[result.primary] || []).filter(q => {
-    const isFria = (q.refs || []).some(r => (typeof r === 'string' ? r : '') === 'art. 27');
-    return !isFria || friaRequired;
-  }).forEach((q, i) => {
+  (QUICKWINS[result.primary] || [])
+    .filter(q => !isFriaItem(q) || friaRequired)
+    .forEach((q, i) => {
     lines.push(`  ${i + 1}. ${t(q.titre, lang)} [${t(q.delai, lang)}]`);
     lines.push(`     ${t(q.action, lang)}`);
     lines.push(`     ${t(UI.reportRefs, lang)} : ${q.refs.map(r => t(r, lang)).join(' | ')}`);
@@ -1375,10 +1379,7 @@ function buildPrintHTML({ result, answers, lang, today, checked, friaRequired = 
   const meta = CATEGORIES_META[result.primary];
   const role = ROLES.find(r => r.id === answers.role);
   const nature = NATURES.find(n => n.id === answers.nature);
-  const QW = (QUICKWINS[result.primary] || []).filter(q => {
-    const isFria = (q.refs || []).some(r => (typeof r === 'string' ? r : '') === 'art. 27');
-    return !isFria || friaRequired;
-  });
+  const QW = (QUICKWINS[result.primary] || []).filter(q => !isFriaItem(q) || friaRequired);
   const CL = CHECKLIST[result.primary] || [];
   const extraCL = (result.secondary || []).map(s => ({ cat: s, items: CHECKLIST[s] || [] }));
   const applicableTimeline = TIMELINE.filter(m =>
@@ -1654,10 +1655,7 @@ function Result({ answers, result, onRestart }) {
     [answers, lang],
   );
   const QW = QUICKWINS[result.primary] || [];
-  const gatedQW = QW.filter(item => {
-    const isFria = (item.refs || []).some(r => (typeof r === 'string' ? r : '') === 'art. 27');
-    return !isFria || roleNotes.friaRequired;
-  });
+  const gatedQW = QW.filter(item => !isFriaItem(item) || roleNotes.friaRequired);
   const CL = CHECKLIST[result.primary] || [];
   const role = ROLES.find(r => r.id === answers.role);
   const nature = NATURES.find(n => n.id === answers.nature);
@@ -2257,7 +2255,7 @@ export default function App() {
                   <OptionCard
                     key={r.id}
                     selected={answers.role === r.id}
-                    onClick={() => setAnswers({ ...answers, role: r.id })}
+                    onClick={() => setAnswers({ ...answers, role: r.id, deployerKind: null })}
                     icon={r.icon}
                     title={t(r.label, lang)}
                     sub={t(r.sub, lang)}
