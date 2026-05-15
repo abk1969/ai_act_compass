@@ -49,3 +49,5 @@ ai-act-compass-*.pdf
 # Vitest coverage output
 coverage/
 .vercel
+test-results/
+playwright-report/
