@@ -4,6 +4,7 @@ import {
   PROHIBITED_PRACTICES,
   ANNEX_III_AREAS,
   ART50_TRIGGERS,
+  ART5_CARVEOUTS,
 } from './classify.js';
 import { t } from './i18n.js';
 
@@ -230,6 +231,54 @@ describe('i18n parity', () => {
     expect(en.justifications).toHaveLength(fr.justifications.length);
     // Refs differ across languages here ('Annex III §3' vs 'Annexe III §3') —
     // that's by design, so we only assert structural parity, not ref equality.
+  });
+});
+
+describe('ART5_CARVEOUTS — exported metadata', () => {
+  it('exports exactly 3 carve-outs (h, f, g) with correct article refs', () => {
+    expect(ART5_CARVEOUTS).toHaveLength(3);
+    const byId = Object.fromEntries(ART5_CARVEOUTS.map(c => [c.id, c]));
+    expect(byId.h.ref).toBe('art. 5(2)-(3)');
+    expect(byId.f.ref).toBe('art. 5(1)(f) parenthetical');
+    expect(byId.g.ref).toBe('art. 5(1)(g) parenthetical');
+  });
+});
+
+describe('art. 5 carve-outs — INTERDIT filtering', () => {
+  it('returns INTERDIT when carve-out is claimed but prohibition (h) has no carveOut flag', () => {
+    const result = computeCategory({ prohibitions: ['h'] }, 'en');
+    expect(result.primary).toBe('INTERDIT');
+  });
+
+  it('removes prohibition (h) from INTERDIT when prohibitionCarveOuts.h === true', () => {
+    const result = computeCategory({
+      prohibitions: ['h'],
+      prohibitionCarveOuts: { h: true },
+    }, 'en');
+    expect(result.primary).not.toBe('INTERDIT');
+    // Carve-out justification must be emitted
+    expect(result.justifications.some(j => j.ref === 'art. 5(2)-(3)')).toBe(true);
+  });
+
+  it('keeps INTERDIT when one of two selected prohibitions has no carve-out', () => {
+    const result = computeCategory({
+      prohibitions: ['h', 'a'],          // a has no carve-out path
+      prohibitionCarveOuts: { h: true },
+    }, 'en');
+    expect(result.primary).toBe('INTERDIT');
+    // Only prohibition 'a' should appear in the INTERDIT justification list
+    expect(result.justifications.some(j => j.ref === 'art. 5(1)(a)')).toBe(true);
+    expect(result.justifications.some(j => j.ref === 'art. 5(1)(h)')).toBe(false);
+  });
+
+  it('falls through to RISQUE_MINIMAL when every selected prohibition has a carve-out', () => {
+    const result = computeCategory({
+      prohibitions: ['f', 'g'],
+      prohibitionCarveOuts: { f: true, g: true },
+    }, 'en');
+    expect(result.primary).toBe('RISQUE_MINIMAL');
+    expect(result.justifications.some(j => j.ref === 'art. 5(1)(f) parenthetical')).toBe(true);
+    expect(result.justifications.some(j => j.ref === 'art. 5(1)(g) parenthetical')).toBe(true);
   });
 });
 
