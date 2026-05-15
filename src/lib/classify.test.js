@@ -551,3 +551,44 @@ describe('art. 25 — substantial-modification provider flip', () => {
     expect(result.justifications.some(j => j.ref === 'art. 25')).toBe(false);
   });
 });
+
+describe('art. 50(4) §2 — human-edit exemption for AI-generated public-interest text', () => {
+  it('still triggers RISQUE_LIMITE for genai_text when no human-edit claim is made', () => {
+    const result = computeCategory({ art50: ['genai_text'] }, 'en');
+    expect(result.primary).toBe('RISQUE_LIMITE');
+    expect(result.justifications.some(j => j.ref === 'art. 50(4) §2')).toBe(true);
+  });
+
+  it('removes RISQUE_LIMITE contribution of genai_text when art50TextHumanEdit === "oui"', () => {
+    const result = computeCategory({
+      art50: ['genai_text'],
+      art50TextHumanEdit: 'oui',
+    }, 'en');
+    expect(result.primary).not.toBe('RISQUE_LIMITE');
+    expect(result.justifications.some(j => j.ref === 'art. 50(4) §2 carve-out')).toBe(true);
+    expect(result.justifications.some(j => j.ref === 'art. 50(4) §2')).toBe(false);
+  });
+
+  it('keeps other art50 triggers active when only genai_text is carved out', () => {
+    const result = computeCategory({
+      art50: ['genai_text', 'interaction'],
+      art50TextHumanEdit: 'oui',
+    }, 'en');
+    expect(result.primary).toBe('RISQUE_LIMITE');
+    // chatbot trigger still contributes
+    expect(result.justifications.some(j => j.ref === 'art. 50(1)')).toBe(true);
+    // genai_text is carved out
+    expect(result.justifications.some(j => j.ref === 'art. 50(4) §2')).toBe(false);
+    expect(result.justifications.some(j => j.ref === 'art. 50(4) §2 carve-out')).toBe(true);
+  });
+
+  it('emits a French label for the carve-out when lang === "fr"', () => {
+    const result = computeCategory({
+      art50: ['genai_text'],
+      art50TextHumanEdit: 'oui',
+    }, 'fr');
+    const carveOut = result.justifications.find(j => j.ref === 'art. 50(4) §2 carve-out');
+    expect(carveOut).toBeDefined();
+    expect(carveOut.label).toMatch(/édition humaine|revue éditoriale/i);
+  });
+});
