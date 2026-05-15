@@ -343,14 +343,14 @@ describe('computeRoleNotes — art. 27 FRIA applicability', () => {
   const annexIII_2 = { annexIII: [2] };           // critical infrastructure — excluded from FRIA
 
   it('returns friaRequired=false for a provider regardless of tier', () => {
-    const notes = computeRoleNotes(annexIII_3, 'provider', 'en');
+    const notes = computeRoleNotes(annexIII_3, 'fournisseur', 'en');
     expect(notes.friaRequired).toBe(false);
   });
 
   it('returns friaRequired=true for a public-body deployer of Annex III §3', () => {
     const notes = computeRoleNotes(
       { ...annexIII_3, deployerKind: 'public_body' },
-      'deployer',
+      'deployeur',
       'en',
     );
     expect(notes.friaRequired).toBe(true);
@@ -360,7 +360,7 @@ describe('computeRoleNotes — art. 27 FRIA applicability', () => {
   it('returns friaRequired=true for a private-public-service deployer of Annex III §3', () => {
     const notes = computeRoleNotes(
       { ...annexIII_3, deployerKind: 'private_public_service' },
-      'deployer',
+      'deployeur',
       'en',
     );
     expect(notes.friaRequired).toBe(true);
@@ -370,7 +370,7 @@ describe('computeRoleNotes — art. 27 FRIA applicability', () => {
   it('returns friaRequired=false for a public-body deployer of Annex III §2 (critical infrastructure)', () => {
     const notes = computeRoleNotes(
       { ...annexIII_2, deployerKind: 'public_body' },
-      'deployer',
+      'deployeur',
       'en',
     );
     expect(notes.friaRequired).toBe(false);
@@ -379,7 +379,7 @@ describe('computeRoleNotes — art. 27 FRIA applicability', () => {
   it('returns friaRequired=true for any deployer of Annex III §5 (credit/insurance pathway)', () => {
     const notes = computeRoleNotes(
       { ...annexIII_5, deployerKind: 'private_other' },
-      'deployer',
+      'deployeur',
       'en',
     );
     expect(notes.friaRequired).toBe(true);
@@ -389,7 +389,7 @@ describe('computeRoleNotes — art. 27 FRIA applicability', () => {
   it('returns friaRequired=false when system is not high-risk (no Annex III selected)', () => {
     const notes = computeRoleNotes(
       { annexIII: [], deployerKind: 'public_body' },
-      'deployer',
+      'deployeur',
       'en',
     );
     expect(notes.friaRequired).toBe(false);
@@ -398,7 +398,7 @@ describe('computeRoleNotes — art. 27 FRIA applicability', () => {
   it('emits a French label when lang === "fr"', () => {
     const notes = computeRoleNotes(
       { annexIII: [5], deployerKind: 'private_other' },
-      'deployer',
+      'deployeur',
       'fr',
     );
     expect(notes.friaRequired).toBe(true);

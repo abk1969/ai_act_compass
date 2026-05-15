@@ -383,7 +383,7 @@ export function computeRoleNotes(answers, role, lang) {
     ? 'FRIA required before first use (Annex III §5 credit-scoring or life/health-insurance pathway — applies regardless of deployer kind).'
     : 'FRIA requise avant première utilisation (Annexe III §5 — scoring de crédit ou tarification vie/santé — applicable quel que soit le type de déployeur).';
 
-  if (role !== 'deployer') return { friaRequired: false, friaReason: null };
+  if (role !== 'deployeur') return { friaRequired: false, friaReason: null };
 
   const areas = answers.annexIII || [];
   const inAnnexIIIOtherThan2 = areas.some(id => id !== 2 && id >= 1 && id <= 8);
