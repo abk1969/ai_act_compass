@@ -11,6 +11,7 @@ import {
   computeRoleNotes,
   PROHIBITED_PRACTICES,
   ANNEX_III_AREAS,
+  ANNEX_III_5_SUBITEMS,
   ART50_TRIGGERS,
   ART5_CARVEOUTS,
 } from './src/lib/classify.js';
@@ -2172,7 +2173,7 @@ export default function App() {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({
     role: null, nature: null, prohibitions: null, prohibitionCarveOuts: {}, annexI: null,
-    annexIII: [], exceptions: null, profiling: false, art50: [], gpaiSystemic: null,
+    annexIII: [], annexIII5Subitems: [], exceptions: null, profiling: false, art50: [], gpaiSystemic: null,
     deployerKind: null, substantialModification: null,
   });
 
@@ -2196,7 +2197,7 @@ export default function App() {
   const restart = () => {
     setAnswers({
       role: null, nature: null, prohibitions: null, prohibitionCarveOuts: {}, annexI: null,
-      annexIII: [], exceptions: null, profiling: false, art50: [], gpaiSystemic: null,
+      annexIII: [], annexIII5Subitems: [], exceptions: null, profiling: false, art50: [], gpaiSystemic: null,
       deployerKind: null, substantialModification: null,
     });
     setStep(0);
@@ -2453,6 +2454,8 @@ export default function App() {
                           annexIII: upd,
                           // Bug C : reset exceptions when no Annex III area is selected
                           exceptions: upd.length === 0 ? null : answers.exceptions,
+                          // Clear §5 sub-items when §5 is deselected
+                          annexIII5Subitems: upd.includes(5) ? answers.annexIII5Subitems : [],
                         });
                       }}
                       icon={a.icon}
@@ -2461,6 +2464,37 @@ export default function App() {
                   );
                 })}
               </div>
+
+              {answers.annexIII.includes(5) && (
+                <div className="mt-6 space-y-2">
+                  <div className="text-sm uppercase tracking-wider opacity-60">
+                    {lang === 'en' ? 'Annex III §5 sub-items (art. 27(1)(b) gating)' : 'Sous-rubriques Annexe III §5 (gating art. 27(1)(b))'}
+                  </div>
+                  <div className="text-xs opacity-70">
+                    {lang === 'en'
+                      ? 'Tick the sub-item(s) that apply. FRIA via art. 27(1)(b) triggers ONLY on §5(b) credit-scoring or §5(c) life/health insurance — (a) and (d) fall back to path (a).'
+                      : 'Cochez la ou les sous-rubriques applicables. La FRIA art. 27(1)(b) ne se déclenche QUE sur §5(b) scoring de crédit ou §5(c) assurance vie/santé — (a) et (d) basculent sur le chemin (a).'}
+                  </div>
+                  {ANNEX_III_5_SUBITEMS.map(sub => {
+                    const sel = (answers.annexIII5Subitems || []).includes(sub.id);
+                    return (
+                      <OptionCard
+                        key={`a3-5-${sub.id}`}
+                        multi
+                        selected={sel}
+                        onClick={() => {
+                          const cur = answers.annexIII5Subitems || [];
+                          const upd = sel ? cur.filter(x => x !== sub.id) : [...cur, sub.id];
+                          setAnswers({ ...answers, annexIII5Subitems: upd });
+                        }}
+                        title={t(sub.label, lang)}
+                        sub={sub.ref}
+                        desc={t(sub.desc, lang)}
+                      />
+                    );
+                  })}
+                </div>
+              )}
 
               {answers.annexIII.length > 0 && (
                 <div className="mt-12 pt-8 border-t-2 border-ink">

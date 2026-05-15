@@ -376,9 +376,9 @@ describe('computeRoleNotes — art. 27 FRIA applicability', () => {
     expect(notes.friaRequired).toBe(false);
   });
 
-  it('returns friaRequired=true for any deployer of Annex III §5 (credit/insurance pathway)', () => {
+  it('returns friaRequired=true for any deployer of Annex III §5(b)/§5(c) (credit/insurance pathway)', () => {
     const notes = computeRoleNotes(
-      { ...annexIII_5, deployerKind: 'private_other' },
+      { annexIII: [5], annexIII5Subitems: ['b'], deployerKind: 'private_other' },
       'deployeur',
       'en',
     );
@@ -397,12 +397,75 @@ describe('computeRoleNotes — art. 27 FRIA applicability', () => {
 
   it('emits a French label when lang === "fr"', () => {
     const notes = computeRoleNotes(
-      { annexIII: [5], deployerKind: 'private_other' },
+      { annexIII: [5], annexIII5Subitems: ['c'], deployerKind: 'private_other' },
       'deployeur',
       'fr',
     );
     expect(notes.friaRequired).toBe(true);
     expect(notes.friaReason.label).toMatch(/FRIA requise/);
+  });
+});
+
+describe('Annex III §5 sub-items — art. 27(1)(b) refinement', () => {
+  const subItem = (subs) => ({ annexIII: [5], annexIII5Subitems: subs });
+
+  it('triggers art. 27(1)(b) for §5(b) credit-scoring sub-item', () => {
+    const notes = computeRoleNotes(
+      { ...subItem(['b']), deployerKind: 'private_other' },
+      'deployeur',
+      'en',
+    );
+    expect(notes.friaRequired).toBe(true);
+    expect(notes.friaReason.ref).toBe('art. 27(1)(b)');
+  });
+
+  it('triggers art. 27(1)(b) for §5(c) life/health insurance sub-item', () => {
+    const notes = computeRoleNotes(
+      { ...subItem(['c']), deployerKind: 'private_other' },
+      'deployeur',
+      'en',
+    );
+    expect(notes.friaRequired).toBe(true);
+    expect(notes.friaReason.ref).toBe('art. 27(1)(b)');
+  });
+
+  it('does NOT trigger art. 27(1)(b) for §5(a) public benefits alone — falls back to path (a)', () => {
+    const notes = computeRoleNotes(
+      { ...subItem(['a']), deployerKind: 'private_other' },
+      'deployeur',
+      'en',
+    );
+    expect(notes.friaRequired).toBe(false);
+  });
+
+  it('does NOT trigger art. 27(1)(b) for §5(d) emergency dispatch alone — falls back to path (a)', () => {
+    const notes = computeRoleNotes(
+      { ...subItem(['d']), deployerKind: 'public_body' },
+      'deployeur',
+      'en',
+    );
+    // Falls back to path (a) because deployerKind is public_body and §5 is in Annex III ≠ §2
+    expect(notes.friaRequired).toBe(true);
+    expect(notes.friaReason.ref).toBe('art. 27(1)(a)');
+  });
+
+  it('does NOT trigger art. 27(1)(b) when §5 is selected without any sub-items (user did not refine)', () => {
+    const notes = computeRoleNotes(
+      { annexIII: [5], deployerKind: 'private_other' },
+      'deployeur',
+      'en',
+    );
+    expect(notes.friaRequired).toBe(false);
+  });
+
+  it('still triggers art. 27(1)(b) when mixed sub-items include (b) — selection-based, not exclusive', () => {
+    const notes = computeRoleNotes(
+      { ...subItem(['a', 'b']), deployerKind: 'private_other' },
+      'deployeur',
+      'en',
+    );
+    expect(notes.friaRequired).toBe(true);
+    expect(notes.friaReason.ref).toBe('art. 27(1)(b)');
   });
 });
 

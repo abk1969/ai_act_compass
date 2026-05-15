@@ -212,6 +212,48 @@ export const ANNEX_III_AREAS = [
   },
 ];
 
+// Annex III §5 sub-items per Reg. 2024/1689. The art. 27(1)(b) FRIA pathway
+// gates only on (b) credit-scoring and (c) life/health insurance — (a) and (d)
+// fall back to path (a)'s deployerKind requirement.
+export const ANNEX_III_5_SUBITEMS = [
+  {
+    id: 'a',
+    ref: 'Annex III §5(a)',
+    label: { en: 'Eligibility for public assistance benefits and services', fr: 'Éligibilité aux prestations et services d\'assistance publique' },
+    desc:  {
+      en: 'Public authority decisions on access to public benefits and services. Falls back to path (a) FRIA gate (deployerKind required).',
+      fr: 'Décisions d\'autorités publiques sur l\'accès aux prestations et services publics. Bascule sur le gating FRIA chemin (a) (type de déployeur requis).',
+    },
+  },
+  {
+    id: 'b',
+    ref: 'Annex III §5(b)',
+    label: { en: 'Creditworthiness / credit-scoring', fr: 'Solvabilité / scoring de crédit' },
+    desc:  {
+      en: 'Credit-scoring of natural persons (excluding fraud detection). Triggers art. 27(1)(b) FRIA regardless of deployerKind.',
+      fr: 'Scoring de crédit de personnes physiques (hors détection de fraude). Déclenche la FRIA art. 27(1)(b) quel que soit le type de déployeur.',
+    },
+  },
+  {
+    id: 'c',
+    ref: 'Annex III §5(c)',
+    label: { en: 'Life and health insurance risk assessment and pricing', fr: 'Évaluation des risques et tarification assurance vie / santé' },
+    desc:  {
+      en: 'Risk assessment and pricing for natural persons in life and health insurance. Triggers art. 27(1)(b) FRIA regardless of deployerKind.',
+      fr: 'Évaluation des risques et tarification pour personnes physiques en assurance vie et santé. Déclenche la FRIA art. 27(1)(b) quel que soit le type de déployeur.',
+    },
+  },
+  {
+    id: 'd',
+    ref: 'Annex III §5(d)',
+    label: { en: 'Emergency calls dispatching and triage', fr: 'Dispatching et triage des appels d\'urgence' },
+    desc:  {
+      en: 'Emergency-call dispatch and triage of emergency first-response services. Falls back to path (a) FRIA gate (deployerKind required).',
+      fr: 'Dispatching d\'appels d\'urgence et triage des services de première intervention. Bascule sur le gating FRIA chemin (a) (type de déployeur requis).',
+    },
+  },
+];
+
 export const ART50_TRIGGERS = [
   {
     id: 'interaction',
@@ -396,10 +438,11 @@ export function computeRoleNotes(answers, role, lang) {
 
   const areas = answers.annexIII || [];
   const inAnnexIIIOtherThan2 = areas.some(id => id !== 2 && id >= 1 && id <= 8);
-  const inAnnexIII5 = areas.includes(5);
+  const annexIII5Subs = answers.annexIII5Subitems || [];
+  const inAnnexIII5bOr5c = areas.includes(5) && annexIII5Subs.some(s => s === 'b' || s === 'c');
 
   // Path (b) is checked first — it overrides deployer-kind filtering.
-  if (inAnnexIII5) {
+  if (inAnnexIII5bOr5c) {
     return { friaRequired: true, friaReason: { ref: 'art. 27(1)(b)', label: friaB } };
   }
 
