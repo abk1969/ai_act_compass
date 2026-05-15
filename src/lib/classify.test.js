@@ -5,8 +5,8 @@ import {
   ANNEX_III_AREAS,
   ART50_TRIGGERS,
   ART5_CARVEOUTS,
+  computeRoleNotes,
 } from './classify.js';
-import { computeRoleNotes } from './classify.js';
 import { t } from './i18n.js';
 
 describe('classify.js — module surface', () => {
@@ -402,6 +402,6 @@ describe('computeRoleNotes — art. 27 FRIA applicability', () => {
       'fr',
     );
     expect(notes.friaRequired).toBe(true);
-    expect(notes.friaReason.label).toMatch(/FRIA|évaluation d'impact/i);
+    expect(notes.friaReason.label).toMatch(/FRIA requise/);
   });
 });
