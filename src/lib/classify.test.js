@@ -405,3 +405,49 @@ describe('computeRoleNotes — art. 27 FRIA applicability', () => {
     expect(notes.friaReason.label).toMatch(/FRIA requise/);
   });
 });
+
+describe('art. 25 — substantial-modification provider flip', () => {
+  it('keeps the integrator note when substantialModification is unset', () => {
+    const result = computeCategory({ nature: 'systeme_sur_gpai' }, 'en');
+    expect(result.primary).not.toBe('GPAI');
+    expect(result.justifications.some(j => j.ref === 'art. 25 + art. 53')).toBe(true);
+  });
+
+  it('keeps the integrator note when substantialModification === "non"', () => {
+    const result = computeCategory({
+      nature: 'systeme_sur_gpai',
+      substantialModification: 'non',
+    }, 'en');
+    expect(result.primary).not.toBe('GPAI');
+    expect(result.justifications.some(j => j.ref === 'art. 25 + art. 53')).toBe(true);
+  });
+
+  it('flips to GPAI when substantialModification === "oui" and gpaiSystemic !== "oui"', () => {
+    const result = computeCategory({
+      nature: 'systeme_sur_gpai',
+      substantialModification: 'oui',
+    }, 'en');
+    expect(result.primary).toBe('GPAI');
+    expect(result.justifications.some(j => j.ref === 'art. 25')).toBe(true);
+  });
+
+  it('flips to GPAI_RS when substantialModification === "oui" and gpaiSystemic === "oui"', () => {
+    const result = computeCategory({
+      nature: 'systeme_sur_gpai',
+      substantialModification: 'oui',
+      gpaiSystemic: 'oui',
+    }, 'en');
+    expect(result.primary).toBe('GPAI_RS');
+    expect(result.justifications.some(j => j.ref === 'art. 25')).toBe(true);
+  });
+
+  it('emits a French art. 25 flip label when lang === "fr"', () => {
+    const result = computeCategory({
+      nature: 'systeme_sur_gpai',
+      substantialModification: 'oui',
+    }, 'fr');
+    const flip = result.justifications.find(j => j.ref === 'art. 25');
+    expect(flip).toBeDefined();
+    expect(flip.label).toMatch(/modification substantielle/i);
+  });
+});
