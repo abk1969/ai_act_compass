@@ -84,6 +84,48 @@ export const PROHIBITED_PRACTICES = [
   },
 ];
 
+export const ART5_CARVEOUTS = [
+  {
+    id: 'h',
+    appliesTo: 'h',
+    ref: 'art. 5(2)-(3)',
+    label: {
+      en: 'Real-time RBI — law enforcement exception',
+      fr: 'IBR temps réel — exception forces de l\'ordre',
+    },
+    desc: {
+      en: 'Use is strictly necessary for: (i) targeted search for victims (abduction, trafficking, sexual exploitation) or missing persons; (ii) prevention of specific substantial/imminent threat to life or terrorist attack; (iii) localisation/identification of suspects of Annex II offences punishable by ≥4-year custodial sentence. Requires prior judicial/administrative authorisation + FRIA + Annex VI registration. Counsel verification required.',
+      fr: 'Usage strictement nécessaire à : (i) recherche ciblée de victimes (enlèvement, traite, exploitation sexuelle) ou personnes disparues ; (ii) prévention d\'une menace grave et imminente pour la vie ou d\'un acte terroriste ; (iii) localisation/identification de suspects d\'infractions Annexe II passibles d\'une peine ≥ 4 ans. Autorisation judiciaire/administrative préalable + FRIA + enregistrement Annexe VI requis. Vérification juridique requise.',
+    },
+  },
+  {
+    id: 'f',
+    appliesTo: 'f',
+    ref: 'art. 5(1)(f) parenthetical',
+    label: {
+      en: 'Emotion recognition — medical or safety carve-out',
+      fr: 'Reconnaissance émotionnelle — exception médicale ou de sécurité',
+    },
+    desc: {
+      en: 'Workplace/education emotion recognition is not prohibited if intended to be put in place or into the market strictly for medical or safety reasons. Counsel verification required.',
+      fr: 'La reconnaissance émotionnelle au travail/en éducation n\'est pas interdite si destinée à être mise en place ou sur le marché strictement pour des raisons médicales ou de sécurité. Vérification juridique requise.',
+    },
+  },
+  {
+    id: 'g',
+    appliesTo: 'g',
+    ref: 'art. 5(1)(g) parenthetical',
+    label: {
+      en: 'Biometric categorisation — law enforcement / legally acquired dataset',
+      fr: 'Catégorisation biométrique — forces de l\'ordre / jeu légalement acquis',
+    },
+    desc: {
+      en: 'Biometric categorisation of sensitive attributes is not prohibited where labelling/filtering of legally acquired biometric datasets is performed in the area of law enforcement. Counsel verification required.',
+      fr: 'La catégorisation biométrique d\'attributs sensibles n\'est pas interdite lorsque l\'étiquetage/filtrage de jeux biométriques légalement acquis est effectué dans le cadre de l\'application de la loi. Vérification juridique requise.',
+    },
+  },
+];
+
 export const ANNEX_III_AREAS = [
   {
     id: 1,
@@ -211,11 +253,25 @@ export function computeCategory(answers, lang) {
   const categories = [];
 
   if (answers.prohibitions && answers.prohibitions.length > 0) {
+    const carveOuts = answers.prohibitionCarveOuts || {};
+    const interdictedRefs = [];
+    const carvedOutRefs = [];
     answers.prohibitions.forEach(id => {
       const p = PROHIBITED_PRACTICES.find(x => x.id === id);
-      justifications.push({ ref: p.ref, label: t(p.label, lang) });
+      if (carveOuts[id]) {
+        const co = ART5_CARVEOUTS.find(c => c.appliesTo === id);
+        if (co) carvedOutRefs.push({ ref: co.ref, label: t(co.label, lang) });
+      } else {
+        interdictedRefs.push({ ref: p.ref, label: t(p.label, lang) });
+      }
     });
-    return { primary: 'INTERDIT', secondary: null, justifications };
+    if (interdictedRefs.length > 0) {
+      // At least one un-carved-out prohibition remains → still INTERDIT.
+      return { primary: 'INTERDIT', secondary: null, justifications: interdictedRefs };
+    }
+    // Every selected prohibition has a claimed carve-out → fall through to the
+    // rest of the classification tree, preserving the carve-out trace.
+    carvedOutRefs.forEach(j => justifications.push(j));
   }
 
   // Important : un système qui REPOSE sur un GPAI tiers (`systeme_sur_gpai`) n'est PAS lui-même
