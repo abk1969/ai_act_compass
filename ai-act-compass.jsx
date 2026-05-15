@@ -2172,7 +2172,7 @@ export default function App() {
   const [lang, setLang] = useState('en'); // EN by default
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({
-    role: null, nature: null, prohibitions: null, prohibitionCarveOuts: {}, annexI: null,
+    role: null, nature: null, prohibitions: null, prohibitionCarveOuts: {}, annexICoverage: null, annexI3rdPartyCA: null,
     annexIII: [], annexIII5Subitems: [], exceptions: null, profiling: false, art50: [], gpaiSystemic: null,
     deployerKind: null, substantialModification: null,
   });
@@ -2196,7 +2196,7 @@ export default function App() {
 
   const restart = () => {
     setAnswers({
-      role: null, nature: null, prohibitions: null, prohibitionCarveOuts: {}, annexI: null,
+      role: null, nature: null, prohibitions: null, prohibitionCarveOuts: {}, annexICoverage: null, annexI3rdPartyCA: null,
       annexIII: [], annexIII5Subitems: [], exceptions: null, profiling: false, art50: [], gpaiSystemic: null,
       deployerKind: null, substantialModification: null,
     });
@@ -2412,22 +2412,56 @@ export default function App() {
               stepNum={4} totalSteps={TOTAL_STEPS}
               title={t(UI.q4Title, lang)}
               subtitle={t(UI.q4Sub, lang)}
-              canNext={answers.annexI !== null}
+              canNext={answers.annexICoverage !== null && answers.annexI3rdPartyCA !== null}
               onNext={next} onBack={back}
             >
-              <div className="space-y-3">
-                <OptionCard
-                  selected={answers.annexI === 'oui'}
-                  onClick={() => setAnswers({ ...answers, annexI: 'oui' })}
-                  title={t(UI.yes, lang)}
-                  sub={lang === 'en' ? 'art. 6(1) + Annex I' : 'art. 6(1) + Annexe I'}
-                  desc={t(UI.q4YesDesc, lang)}
-                />
-                <OptionCard
-                  selected={answers.annexI === 'non'}
-                  onClick={() => setAnswers({ ...answers, annexI: 'non' })}
-                  title={t(UI.no, lang)} desc={t(UI.q4NoDesc, lang)}
-                />
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <div className="text-sm uppercase tracking-wider opacity-60">
+                    {lang === 'en' ? '1. Annex I coverage' : '1. Couverture Annexe I'}
+                  </div>
+                  <OptionCard
+                    selected={answers.annexICoverage === 'oui'}
+                    onClick={() => setAnswers({ ...answers, annexICoverage: 'oui' })}
+                    title={t(UI.yes, lang)}
+                    sub={lang === 'en' ? 'Annex I harmonisation legislation' : 'Législation d\'harmonisation Annexe I'}
+                    desc={lang === 'en'
+                      ? 'My system is a safety component of (or itself) a product covered by an Annex I sectoral regulation (machinery, medical devices, toys, motor vehicles, lifts, radio equipment, …).'
+                      : 'Mon système est un composant de sécurité (ou est lui-même) un produit couvert par une réglementation sectorielle Annexe I (machines, dispositifs médicaux, jouets, automobiles, ascenseurs, équipements radio, …).'}
+                  />
+                  <OptionCard
+                    selected={answers.annexICoverage === 'non'}
+                    onClick={() => setAnswers({ ...answers, annexICoverage: 'non', annexI3rdPartyCA: 'non' })}
+                    title={t(UI.no, lang)}
+                    desc={lang === 'en' ? 'My system does not fall within Annex I scope.' : 'Mon système n\'entre pas dans le champ Annexe I.'}
+                  />
+                </div>
+
+                {answers.annexICoverage === 'oui' && (
+                  <div className="space-y-3">
+                    <div className="text-sm uppercase tracking-wider opacity-60">
+                      {lang === 'en' ? '2. Third-party conformity assessment' : '2. Évaluation de conformité par tiers'}
+                    </div>
+                    <div className="text-xs opacity-70">
+                      {lang === 'en'
+                        ? 'art. 6(1) is cumulative: HAUT_RISQUE_ANNEXE_I requires BOTH Annex I coverage AND a third-party CA obligation under that sectoral regime.'
+                        : 'L\'art. 6(1) est cumulatif : HAUT_RISQUE_ANNEXE_I exige la couverture Annexe I ET une obligation d\'évaluation de conformité par tiers sous ce régime sectoriel.'}
+                    </div>
+                    <OptionCard
+                      selected={answers.annexI3rdPartyCA === 'oui'}
+                      onClick={() => setAnswers({ ...answers, annexI3rdPartyCA: 'oui' })}
+                      title={t(UI.yes, lang)}
+                      sub="art. 6(1)"
+                      desc={lang === 'en' ? 'The sectoral regulation requires third-party CA for this product.' : 'La réglementation sectorielle exige une évaluation de conformité par tiers pour ce produit.'}
+                    />
+                    <OptionCard
+                      selected={answers.annexI3rdPartyCA === 'non'}
+                      onClick={() => setAnswers({ ...answers, annexI3rdPartyCA: 'non' })}
+                      title={t(UI.no, lang)}
+                      desc={lang === 'en' ? 'Self-assessment route under the sectoral regulation.' : 'Voie d\'auto-évaluation sous la réglementation sectorielle.'}
+                    />
+                  </div>
+                )}
               </div>
             </QuestionFrame>
           )}

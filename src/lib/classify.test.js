@@ -53,7 +53,8 @@ describe('art. 5 — prohibited practices', () => {
       prohibitions: ['a'],
       annexIII: [3, 4],          // education + employment
       art50: ['interaction'],     // chatbot trigger
-      annexI: 'oui',
+      annexICoverage: 'oui',
+      annexI3rdPartyCA: 'oui',
       nature: 'gpai',
       gpaiSystemic: 'oui',
     }, 'en');
@@ -66,11 +67,35 @@ describe('art. 5 — prohibited practices', () => {
   });
 });
 
-describe('art. 6(1) — Annex I product safety pathway', () => {
-  it('returns HAUT_RISQUE_ANNEXE_I when annexI === "oui"', () => {
-    const result = computeCategory({ annexI: 'oui' }, 'en');
+describe('art. 6(1) — Annex I product safety pathway (cumulative test)', () => {
+  it('returns HAUT_RISQUE_ANNEXE_I when BOTH annexICoverage AND annexI3rdPartyCA are "oui"', () => {
+    const result = computeCategory({
+      annexICoverage: 'oui',
+      annexI3rdPartyCA: 'oui',
+    }, 'en');
     expect(result.primary).toBe('HAUT_RISQUE_ANNEXE_I');
     expect(result.justifications.some(j => /Annex I|Annexe I/.test(j.ref))).toBe(true);
+  });
+
+  it('does NOT trigger HAUT_RISQUE_ANNEXE_I when only coverage is "oui" (no 3rd-party CA)', () => {
+    const result = computeCategory({
+      annexICoverage: 'oui',
+      annexI3rdPartyCA: 'non',
+    }, 'en');
+    expect(result.primary).not.toBe('HAUT_RISQUE_ANNEXE_I');
+  });
+
+  it('does NOT trigger HAUT_RISQUE_ANNEXE_I when only 3rd-party CA is "oui" (no Annex I coverage)', () => {
+    const result = computeCategory({
+      annexICoverage: 'non',
+      annexI3rdPartyCA: 'oui',
+    }, 'en');
+    expect(result.primary).not.toBe('HAUT_RISQUE_ANNEXE_I');
+  });
+
+  it('does NOT trigger HAUT_RISQUE_ANNEXE_I when neither is set (defaults to null)', () => {
+    const result = computeCategory({}, 'en');
+    expect(result.primary).not.toBe('HAUT_RISQUE_ANNEXE_I');
   });
 });
 
@@ -162,7 +187,8 @@ describe('art. 51-55 + art. 25 — GPAI', () => {
 describe('priority ordering across multiple triggers', () => {
   it('orders categories: Annex I > Annex III > GPAI_RS > GPAI > RISQUE_LIMITE', () => {
     const result = computeCategory({
-      annexI: 'oui',
+      annexICoverage: 'oui',
+      annexI3rdPartyCA: 'oui',
       annexIII: [3],
       art50: ['interaction'],
       nature: 'gpai',
@@ -208,7 +234,8 @@ describe('i18n parity', () => {
   it('produces identical primary, secondary, and justification refs across en and fr (language-independent refs only)', () => {
     const answers = {
       prohibitions: [],
-      annexI: 'non',
+      annexICoverage: 'non',
+      annexI3rdPartyCA: 'non',
       annexIII: [],
       art50: ['interaction', 'genai_media'],
       nature: 'gpai',
