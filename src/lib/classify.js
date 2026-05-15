@@ -334,9 +334,18 @@ export function computeCategory(answers, lang) {
     categories.push('RISQUE_LIMITE');
   }
 
-  if (isGPAIProvider) {
-    if (isGPAI_RS) categories.push('GPAI_RS');
+  const flipsViaArt25 = isOnGPAI && answers.substantialModification === 'oui';
+  if (isGPAIProvider || flipsViaArt25) {
+    if (isGPAI_RS || (flipsViaArt25 && answers.gpaiSystemic === 'oui')) categories.push('GPAI_RS');
     else categories.push('GPAI');
+    if (flipsViaArt25) {
+      justifications.push({
+        ref: 'art. 25',
+        label: lang === 'en'
+          ? 'Substantial modification of a third-party GPAI model — integrator is requalified as a provider; GPAI obligations (art. 53–55) now apply.'
+          : 'Modification substantielle d\'un modèle GPAI tiers — l\'intégrateur est requalifié en provider ; les obligations GPAI (art. 53–55) s\'appliquent désormais.',
+      });
+    }
   } else if (isOnGPAI) {
     // Information non-bloquante : rappeler que les obligations GPAI restent côté fournisseur du modèle,
     // sauf si l'utilisateur opère une modification substantielle (art. 25) le requalifiant.
