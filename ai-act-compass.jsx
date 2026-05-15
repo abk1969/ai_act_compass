@@ -2173,7 +2173,7 @@ export default function App() {
   const [answers, setAnswers] = useState({
     role: null, nature: null, prohibitions: null, prohibitionCarveOuts: {}, annexI: null,
     annexIII: [], exceptions: null, profiling: false, art50: [], gpaiSystemic: null,
-    deployerKind: null,
+    deployerKind: null, substantialModification: null,
   });
 
   // Fonts (Fraunces variable + JetBrains Mono) are loaded via @import in
@@ -2197,7 +2197,7 @@ export default function App() {
     setAnswers({
       role: null, nature: null, prohibitions: null, prohibitionCarveOuts: {}, annexI: null,
       annexIII: [], exceptions: null, profiling: false, art50: [], gpaiSystemic: null,
-      deployerKind: null,
+      deployerKind: null, substantialModification: null,
     });
     setStep(0);
   };
@@ -2304,13 +2304,42 @@ export default function App() {
                   <OptionCard
                     key={n.id}
                     selected={answers.nature === n.id}
-                    onClick={() => setAnswers({ ...answers, nature: n.id })}
+                    onClick={() => setAnswers({ ...answers, nature: n.id, substantialModification: null })}
                     title={t(n.label, lang)}
                     sub={t(n.sub, lang)}
                     desc={t(n.desc, lang)}
                   />
                 ))}
               </div>
+              {answers.nature === 'systeme_sur_gpai' && (
+                <div className="mt-6 space-y-2">
+                  <div className="text-sm uppercase tracking-wider opacity-60">
+                    {lang === 'en' ? 'Substantial modification (art. 25)' : 'Modification substantielle (art. 25)'}
+                  </div>
+                  <div className="text-xs opacity-70">
+                    {lang === 'en'
+                      ? 'Have you fine-tuned, retrained, or repurposed the third-party model in a way that materially changes its intended purpose or affects its compliance? (See recitals 84, 109.)'
+                      : 'Avez-vous fine-tuné, réentraîné ou repurposé le modèle tiers d\'une manière qui modifie matériellement sa finalité ou affecte sa conformité ? (Cf. considérants 84, 109.)'}
+                  </div>
+                  <OptionCard
+                    selected={answers.substantialModification === 'oui'}
+                    onClick={() => setAnswers({ ...answers, substantialModification: 'oui' })}
+                    title={lang === 'en' ? 'Yes — substantial modification' : 'Oui — modification substantielle'}
+                    sub="art. 25"
+                    desc={lang === 'en'
+                      ? 'You are flipped to GPAI provider for the modified model — art. 53–55 obligations apply.'
+                      : 'Vous êtes requalifié en fournisseur GPAI pour le modèle modifié — obligations art. 53–55 applicables.'}
+                  />
+                  <OptionCard
+                    selected={answers.substantialModification === 'non'}
+                    onClick={() => setAnswers({ ...answers, substantialModification: 'non' })}
+                    title={lang === 'en' ? 'No — pure integration' : 'Non — intégration pure'}
+                    desc={lang === 'en'
+                      ? 'GPAI obligations remain with the upstream model provider; you operate under the AI-system regime only.'
+                      : 'Les obligations GPAI restent sur le fournisseur amont ; vous opérez sous le régime système IA uniquement.'}
+                  />
+                </div>
+              )}
             </QuestionFrame>
           )}
 
