@@ -3,7 +3,11 @@
  * Records a sub-10-second 1920×1080 MP4 demo of AI Act Compass
  * suitable for a LinkedIn post.
  *
- * Flow: Welcome → Start → Provider → AI system → Subliminal → Verdict
+ * Flow (post-audit narrative, showcases the art. 5(2)-(3) carve-out):
+ *   Welcome → Start → Provider → AI system →
+ *   Real-time remote biometric ID (art. 5(1)(h) — prohibited) →
+ *   Carve-out reveal: art. 5(2)-(3) law-enforcement exception →
+ *   Hold on the "the most prohibited AI tech still has a regulated path" beat.
  *
  * Steps:
  *   1. Spawns the Vite dev server on :5180
@@ -170,15 +174,20 @@ async function record() {
   await moveAndClick(page, cont2, { hoverMs: 120, steps: 10 });
   await page.waitForTimeout(220);
 
-  // ── Step 3: Subliminal techniques (triggers PROHIBITED) ───────────
-  const subliminal = page.getByRole('checkbox', { name: /Subliminal or manipulative/i });
-  await moveAndClick(page, subliminal, { hoverMs: 200, steps: 14 });
-  await page.waitForTimeout(200);
-  const verdict = page.getByRole('button', { name: /View verdict|Voir le verdict/i });
-  await moveAndClick(page, verdict, { hoverMs: 160, steps: 12 });
+  // ── Step 3: Real-time remote biometric ID — art. 5(1)(h) prohibition ─
+  const rbi = page.getByRole('checkbox', { name: /art\. 5\(1\)\(h\)/i });
+  await moveAndClick(page, rbi, { hoverMs: 220, steps: 14 });
+  await page.waitForTimeout(360); // beat — let the "PROHIBITED" framing land
 
-  // ── Verdict reveal — the climax. Hold long enough for the eye. ─────
-  await page.waitForTimeout(900);
+  // ── Carve-out reveal — the regulatory twist ─────────────────────────
+  // The art. 5(2)-(3) law-enforcement exception card appears as soon as (h)
+  // is ticked. Claiming it pivots the verdict away from INTERDIT — the
+  // headline beat for the post-audit demo.
+  const carveOut = page.getByRole('radio', { name: /art\. 5\(2\)-\(3\)/i });
+  await moveAndClick(page, carveOut, { hoverMs: 280, steps: 16 });
+
+  // ── Hold on the carve-out beat — the eye reads "law enforcement exception"
+  await page.waitForTimeout(1100);
 
   console.log('→ Closing browser, finalising WebM…');
   await ctx.close();
