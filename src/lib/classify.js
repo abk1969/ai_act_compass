@@ -218,7 +218,7 @@ export const ANNEX_III_AREAS = [
 export const ANNEX_III_5_SUBITEMS = [
   {
     id: 'a',
-    ref: 'Annex III §5(a)',
+    ref: { en: 'Annex III §5(a)', fr: 'Annexe III §5(a)' },
     label: { en: 'Eligibility for public assistance benefits and services', fr: 'Éligibilité aux prestations et services d\'assistance publique' },
     desc:  {
       en: 'Public authority decisions on access to public benefits and services. Falls back to path (a) FRIA gate (deployerKind required).',
@@ -227,7 +227,7 @@ export const ANNEX_III_5_SUBITEMS = [
   },
   {
     id: 'b',
-    ref: 'Annex III §5(b)',
+    ref: { en: 'Annex III §5(b)', fr: 'Annexe III §5(b)' },
     label: { en: 'Creditworthiness / credit-scoring', fr: 'Solvabilité / scoring de crédit' },
     desc:  {
       en: 'Credit-scoring of natural persons (excluding fraud detection). Triggers art. 27(1)(b) FRIA regardless of deployerKind.',
@@ -236,7 +236,7 @@ export const ANNEX_III_5_SUBITEMS = [
   },
   {
     id: 'c',
-    ref: 'Annex III §5(c)',
+    ref: { en: 'Annex III §5(c)', fr: 'Annexe III §5(c)' },
     label: { en: 'Life and health insurance risk assessment and pricing', fr: 'Évaluation des risques et tarification assurance vie / santé' },
     desc:  {
       en: 'Risk assessment and pricing for natural persons in life and health insurance. Triggers art. 27(1)(b) FRIA regardless of deployerKind.',
@@ -245,7 +245,7 @@ export const ANNEX_III_5_SUBITEMS = [
   },
   {
     id: 'd',
-    ref: 'Annex III §5(d)',
+    ref: { en: 'Annex III §5(d)', fr: 'Annexe III §5(d)' },
     label: { en: 'Emergency calls dispatching and triage', fr: 'Dispatching et triage des appels d\'urgence' },
     desc:  {
       en: 'Emergency-call dispatch and triage of emergency first-response services. Falls back to path (a) FRIA gate (deployerKind required).',
@@ -431,8 +431,8 @@ export function computeRoleNotes(answers, role, lang) {
     ? 'FRIA required before first use (deployer is public body / private provider of public services and system is Annex III other than §2).'
     : 'FRIA requise avant première utilisation (déployeur public ou privé chargé d\'un service public, et système Annexe III hors §2).';
   const friaB = lang === 'en'
-    ? 'FRIA required before first use (Annex III §5 credit-scoring or life/health-insurance pathway — applies regardless of deployer kind).'
-    : 'FRIA requise avant première utilisation (Annexe III §5 — scoring de crédit ou tarification vie/santé — applicable quel que soit le type de déployeur).';
+    ? 'FRIA required before first use (Annex III §5(b) credit-scoring or §5(c) life/health-insurance — applies regardless of deployer kind).'
+    : 'FRIA requise avant première utilisation (Annexe III §5(b) scoring de crédit ou §5(c) assurance vie/santé — applicable quel que soit le type de déployeur).';
 
   if (role !== 'deployeur') return { friaRequired: false, friaReason: null };
 

@@ -2488,7 +2488,7 @@ export default function App() {
                           setAnswers({ ...answers, annexIII5Subitems: upd });
                         }}
                         title={t(sub.label, lang)}
-                        sub={sub.ref}
+                        sub={t(sub.ref, lang)}
                         desc={t(sub.desc, lang)}
                       />
                     );
