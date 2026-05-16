@@ -59,6 +59,23 @@ describe('App smoke — runtime safety', () => {
     expect(continueBtn).toBeEnabled();
   });
 
+  it('renders the legal footer with the 4 required sections', () => {
+    render(<App />);
+    // Each section header is rendered as a clickable <summary> with this class set.
+    // Body text may also include the same substrings ("personal data" appears in
+    // both the section header and the section body), so we count summaries instead
+    // of asserting unique text matches.
+    const summaries = document.querySelectorAll('footer details summary');
+    expect(summaries.length).toBe(4);
+    const headerTexts = Array.from(summaries).map(s => s.textContent.toLowerCase());
+    expect(headerTexts.some(t => /legal notices/.test(t))).toBe(true);
+    expect(headerTexts.some(t => /personal data/.test(t))).toBe(true);
+    expect(headerTexts.some(t => /disclaimer/.test(t))).toBe(true);
+    expect(headerTexts.some(t => /contact/.test(t))).toBe(true);
+    // The skill anchor at the top of the footer (pre-existing) must remain visible
+    expect(screen.getByText(/ai-act-skills/i)).toBeInTheDocument();
+  });
+
   it('shows the deployerKind sub-question only when role === "deployeur"', async () => {
     const user = userEvent.setup();
     render(<App />);
