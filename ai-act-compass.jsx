@@ -216,6 +216,31 @@ const UI = {
     en: 'Decision-support tool. Does not substitute for qualified legal analysis. Anchor: ISO/IEC 42001:2023 + ISO/IEC 27090:2025.',
     fr: 'Outil d\'aide à la décision. Ne se substitue pas à une analyse juridique. Ancrage : ISO/IEC 42001:2023 + ISO/IEC 27090:2025.',
   },
+  // Footer — legal / data / disclaimer / contact
+  footerLegalLabel:    { en: 'Legal notices',                   fr: 'Mentions légales' },
+  footerDataLabel:     { en: 'Personal data',                   fr: 'Données personnelles' },
+  footerDisclaimerLabel:{ en: 'Disclaimer',                     fr: 'Avertissement' },
+  footerContactLabel:  { en: 'Contact',                         fr: 'Contact' },
+  footerLegalBody: {
+    en: 'Open-source decision-support tool. Source code: github.com/abk1969/ai_act_compass. Publisher and director of publication: see the repository owner. Hosting: deployed as a static SPA — host may vary per deployment (nginx, Vercel, GitHub Pages, etc.). Licence: see the LICENSE file in the repository.',
+    fr: 'Outil d\'aide à la décision open source. Code source : github.com/abk1969/ai_act_compass. Éditeur et directeur de la publication : voir le propriétaire du dépôt. Hébergement : déployé comme SPA statique — l\'hébergeur peut varier selon le déploiement (nginx, Vercel, GitHub Pages, etc.). Licence : voir le fichier LICENSE du dépôt.',
+  },
+  footerDataBody: {
+    en: 'This application runs entirely in your browser. No personal data is collected, stored, transmitted to any server, or shared with any third party. Your answers stay in browser memory for the duration of your session and are discarded on reload. The PDF export is generated locally by your browser via html2pdf.js (loaded from cdnjs as an unmodified static asset). No cookies, no trackers, no analytics. Since nothing leaves your device, there is no processing in the sense of GDPR art. 4(2) by this application — your sole consent action is using the tool.',
+    fr: 'Cette application fonctionne intégralement dans votre navigateur. Aucune donnée personnelle n\'est collectée, stockée, transmise à un serveur ou partagée avec un tiers. Vos réponses restent en mémoire du navigateur le temps de la session et sont effacées au rechargement. L\'export PDF est généré localement par votre navigateur via html2pdf.js (chargé depuis cdnjs comme actif statique non modifié). Aucun cookie, aucun traceur, aucun analytics. Aucune donnée ne quittant votre appareil, il n\'y a pas de traitement au sens de l\'art. 4(2) du RGPD par cette application — votre seule action de consentement est l\'utilisation de l\'outil.',
+  },
+  footerDisclaimerBody: {
+    en: 'Decision-support output. NOT legal advice. Does not substitute for the analysis of qualified counsel or for the conformity assessment by a notified body (Reg. (EU) 2024/1689 art. 43). No guarantee is given as to the accuracy or completeness of the result — the AI Act evolves through delegated and implementing acts, harmonised standards, and codes of practice. Authoritative source: Regulation (EU) 2024/1689 published in OJ L 2024-07-12 with subsequent corrigenda.',
+    fr: 'Aide à la décision. Ne constitue PAS un conseil juridique. Ne se substitue pas à l\'analyse d\'un conseil juridique qualifié ni à l\'évaluation de conformité par un organisme notifié (Règl. (UE) 2024/1689 art. 43). Aucune garantie n\'est donnée quant à l\'exactitude ou la complétude du résultat — l\'AI Act évolue par actes délégués et d\'exécution, normes harmonisées et codes de bonnes pratiques. Source de référence : Règlement (UE) 2024/1689 publié au JO L du 12 juillet 2024 et corrigenda subséquents.',
+  },
+  footerContactBody: {
+    en: 'Technical issues, bug reports, feature requests: open a GitHub issue at github.com/abk1969/ai_act_compass/issues. Other inquiries: contact the repository owner via their GitHub profile.',
+    fr: 'Problèmes techniques, rapports de bugs, suggestions : ouvrir un ticket GitHub sur github.com/abk1969/ai_act_compass/issues. Autres demandes : contacter le propriétaire du dépôt via son profil GitHub.',
+  },
+  footerCopyright: {
+    en: 'AI Act Compass · Open-source decision-support tool · Anchored on Regulation (EU) 2024/1689',
+    fr: 'AI Act Compass · Outil d\'aide à la décision open source · Ancré sur le Règlement (UE) 2024/1689',
+  },
 };
 
 /* ---------------------------------------------------------------------------
@@ -532,20 +557,51 @@ function Header({ step, totalSteps, onRestart, lang, setLang }) {
 
 function Footer() {
   const lang = useLang();
+  const LEGAL_SECTIONS = [
+    { label: UI.footerLegalLabel,      body: UI.footerLegalBody },
+    { label: UI.footerDataLabel,       body: UI.footerDataBody },
+    { label: UI.footerDisclaimerLabel, body: UI.footerDisclaimerBody },
+    { label: UI.footerContactLabel,    body: UI.footerContactBody },
+  ];
   return (
     <footer className="border-t-2 border-ink bg-paper-tint mt-24 print:bg-white print:mt-8 print:break-inside-avoid print:border-t print:border-ink">
-      <div className="max-w-5xl mx-auto px-6 md:px-10 py-10 grid md:grid-cols-[140px_1fr] gap-x-10 gap-y-3">
-        <div className="font-mono uppercase tracking-[0.22em] text-[10px] text-ink-muted">
-          {t(UI.footerNoticeKicker, lang)}
+      <div className="max-w-5xl mx-auto px-6 md:px-10 py-10">
+        {/* Top notice — preserved from prior layout */}
+        <div className="grid md:grid-cols-[140px_1fr] gap-x-10 gap-y-3 pb-8 border-b border-rule">
+          <div className="font-mono uppercase tracking-[0.22em] text-[10px] text-ink-muted">
+            {t(UI.footerNoticeKicker, lang)}
+          </div>
+          <div className="text-[12.5px] text-ink-soft leading-[1.7] max-w-2xl">
+            <p className="mb-3">{t(UI.footerNotice, lang)}</p>
+            <p className="text-ink-muted">
+              {t(UI.footerAnchor, lang)}{' '}
+              <span className="font-mono text-ink">ISO/IEC&nbsp;42001:2023</span>{t(UI.footerAnchorText, lang)}
+              <span className="font-mono text-ink">ISO/IEC&nbsp;27090:2025</span>{t(UI.footerAnchorEnd, lang)}
+              <span className="font-mono">github.com/abk1969/ai-act-skills</span>&nbsp;v1.2.0.
+            </p>
+          </div>
         </div>
-        <div className="text-[12.5px] text-ink-soft leading-[1.7] max-w-2xl">
-          <p className="mb-3">{t(UI.footerNotice, lang)}</p>
-          <p className="text-ink-muted">
-            {t(UI.footerAnchor, lang)}{' '}
-            <span className="font-mono text-ink">ISO/IEC&nbsp;42001:2023</span>{t(UI.footerAnchorText, lang)}
-            <span className="font-mono text-ink">ISO/IEC&nbsp;27090:2025</span>{t(UI.footerAnchorEnd, lang)}
-            <span className="font-mono">github.com/abk1969/ai-act-skills</span>&nbsp;v1.2.0.
-          </p>
+
+        {/* 4 legal sections — collapsed by default (native <details>) */}
+        <div className="pt-8 grid md:grid-cols-2 gap-x-10 gap-y-1 print:hidden">
+          {LEGAL_SECTIONS.map(({ label, body }, i) => (
+            <details key={i} className="group border-b border-rule py-2">
+              <summary className="cursor-pointer list-none flex items-baseline justify-between gap-3 py-1.5 select-none">
+                <span className="font-mono uppercase tracking-[0.22em] text-[10px] text-ink-muted group-hover:text-ink group-open:text-ink transition-colors">
+                  {t(label, lang)}
+                </span>
+                <span className="font-mono text-[10px] text-ink-faint group-open:rotate-90 transition-transform inline-block">›</span>
+              </summary>
+              <p className="text-[12px] text-ink-soft leading-[1.7] mt-2 mb-2 max-w-prose">
+                {t(body, lang)}
+              </p>
+            </details>
+          ))}
+        </div>
+
+        {/* Copyright / byline */}
+        <div className="pt-8 mt-6 border-t border-rule text-[10px] text-ink-faint font-mono uppercase tracking-[0.18em] text-center">
+          {t(UI.footerCopyright, lang)}
         </div>
       </div>
     </footer>
